@@ -168,8 +168,8 @@ public class DAO {
             ps.setInt(5, b.getPage());
             ps.setInt(6, b.getCid());
             ps.setString(7, b.getImage());
-            ps.setInt(8, 20);
-            ps.setInt(9, 0);
+            ps.setInt(8, b.getSold()); // TODO 
+            ps.setInt(9, b.getQuantity());
             ps.setInt(10, b.getPrice());
             rs = ps.executeQuery();
             ps.executeUpdate();
@@ -182,7 +182,7 @@ public class DAO {
 
 		if(b.getImage()==null) {
 			 String query = "update Book set title = ?,author = ?,[description] = ?,\r\n"
-	        		+ "[day] = ?,[page] = ?,cid = ?,price = ? where Book.id = ?";
+	        		+ "[day] = ?,[page] = ?,cid = ?,price = ?, sold = ?, quantity = ? where Book.id = ?";
 			 System.out.println(query);
 		     try {
 		            conn = new SQLConnection().getConnection();
@@ -195,6 +195,8 @@ public class DAO {
 		            ps.setInt(6, b.getCid());
 		            ps.setInt(7, b.getPrice());
 		            ps.setInt(8, bid);
+					ps.setInt(9, b.getSold());
+					ps.setInt(10, b.getQuantity());
 		            rs = ps.executeQuery();
 		            ps.executeUpdate();
 		        } catch (Exception e) {
@@ -204,7 +206,7 @@ public class DAO {
 		}
 		else {
 			String query = "update Book set title = ?,author = ?,[description] = ?,\r\n"
-	        		+ "[day] = ?,[page] = ?,cid = ?,[image] = ? where Book.id = ?";
+	        		+ "[day] = ?,[page] = ?,cid = ?,[image] = ?,price = ?, sold = ?, quantity = ?  where Book.id = ?";
 			System.out.println(query);
 
 	        try {
@@ -218,6 +220,9 @@ public class DAO {
 	            ps.setInt(6, b.getCid());
 	            ps.setString(7, b.getImage());
 	            ps.setInt(8, bid);
+		        ps.setInt(9, b.getPrice());
+				ps.setInt(10, b.getSold());
+				ps.setInt(11, b.getQuantity());
 	            rs = ps.executeQuery();
 	            ps.executeUpdate();
 	        } catch (Exception e) {

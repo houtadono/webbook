@@ -290,7 +290,6 @@ public class AdminController {
 	public String saveBook(@ModelAttribute("book") Book book,Model model,
 			@RequestParam("photo")MultipartFile multipartFile,HttpSession session) throws IOException {
 		DAO dao = new DAO();		
-		System.out.print("hien ra m oi");
 		String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
 		if (!fileName.equals("")) {
 			String uploadDir = "uploads/";

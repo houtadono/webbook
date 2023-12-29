@@ -240,14 +240,45 @@
                 </div>
               </div>
               <div style="margin-left: 10%;width: 40%;margin-top: 15px">
-                <label>Giá bán</label>
+                <label>Giá gốc</label>
                 <div class="input-group">
                   <input name="price" type="number" class="form-control" id="priceBook" th:value="${book.price}"
                     required="1">
                 </div>
               </div>
             </div>
+
+            <div style="display: flex">
+              <div style="width: 40%">
+                <label>Tồn kho</label>
+                <div class="input-group">
+                  <input name="quantity" type="number" class="form-control" id="quantityBook" value="0" th:value="${book.quantity}"
+                    required="1" min="0" max="10000">
+                </div>
+              </div>
+              <div style="margin-left: 10%;width: 40%">
+                <label>Giá giảm</label>
+                  <div class="input-group">
+                    <input name="sold" type="number" class="form-control" id="soldBook" value="0" th:value="${book.sold}" min="0">
+                  </div>
+              </div>
+            </div>
+            
+            <div style="display: flex">
+              <div style="width: 40%">
+                
+              </div>
+              <div style="margin-left: 10%;width: 40%">
+                <label>Giá bán ra</label>
+                  <div class="input-group">
+                    <input name="price_out" type="text" class="form-control" id="price_out" readonly>
+                  </div>
+              </div>
+            </div>
+
           </div>
+
+
           <div style="width: 25%;height: 305px;margin-left: 5%;margin-top: 27px">
             <div id='upload'><label th:onclick="chooseImage()" class="btn btn-success"
                 style="margin-left: 90px;height: 35px">Upload</label></div>
@@ -313,8 +344,8 @@
 
             <div style="display: flex">
               <div style="width: 40%;margin-top: 15px">
-                <div><label>Thể loại
-                  </label><small style="margin-left: 130px;color: red" id="mess4"></small></div>
+                <div>
+                  <label>Thể loại</label><small style="margin-left: 130px;color: red" id="mess4"></small></div>
                 <div>
                   <select name="cid" id="category" style="width: 185px;height: 38px">
                     <option th:value="0" th:if="${checkMethod == -1 && checkC == null}" style="font-size: 14px">Lựa chọn
@@ -326,7 +357,7 @@
                 </div>
               </div>
               <div style="margin-left: 10%;width: 40%;margin-top: 15px">
-                <label>Giá bán</label>
+                <label>Giá gốc</label>
                 <div class="input-group">
                   <input name="price" type="number" class="form-control" id="priceBook" th:value="${book.price}"
                     required="1">
@@ -334,10 +365,32 @@
               </div>
             </div>
 
-            <label>Tồn kho</label>
-            <div class="input-group">
-              <input name="quantity" type="number" class="form-control" id="quantityBook" th:value="${book.quantity}"
-                required="1">
+            <div style="display: flex">
+              <div style="width: 40%">
+                <label>Tồn kho</label>
+                <div class="input-group">
+                  <input name="quantity" type="number" class="form-control" id="quantityBook" th:value="${book.quantity}"
+                    required="1" min="0" max="10000">
+                </div>
+              </div>
+              <div style="margin-left: 10%;width: 40%">
+                <label>Giá giảm</label>
+                  <div class="input-group">
+                    <input name="sold" type="number" class="form-control" id="soldBook" th:value="${book.sold}" min="0">
+                  </div>
+              </div>
+            </div>
+
+            <div style="display: flex">
+              <div style="width: 40%">
+                
+              </div>
+              <div style="margin-left: 10%;width: 40%">
+                <label>Giá bán ra</label>
+                  <div class="input-group">
+                    <input name="price_out" type="text" class="form-control" id="price_out" readonly>
+                  </div>
+              </div>
             </div>
 
           </div>
@@ -403,6 +456,11 @@
 
   <script>
 
+    const VND = new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    });
+
     const showSave = document.querySelector('#btnSave');
     const showEdit = document.querySelector('#btnEdit');
     const upLoad = document.querySelector('#btnUpLoad');
@@ -413,6 +471,21 @@
     const readOnlyPage = document.getElementById('pageBook');
     const readOnlyCategory = document.getElementById('category');
     const price = document.getElementById('priceBook');
+    const sold = document.getElementById('soldBook');
+    const quantity = document.getElementById('quantityBook');
+    const price_out = document.getElementById('price_out');
+    price.addEventListener('input', updateSellingPrice);
+    sold.addEventListener('input', updateSellingPrice);
+
+    // Hàm cập nhật giá bán ra
+    function updateSellingPrice() {
+      var p = (price.value) || 0;
+      var d = (sold.value) || 0;
+
+      // Tính giá bán ra
+      var sellingPrice = p - d;
+      price_out.value = VND.format(sellingPrice) ;
+    }
 
     var state = document.getElementById("checkState").value;
 
@@ -427,6 +500,7 @@
       readOnlyPage.readOnly = true;
       readOnlyCategory.disabled = true;
       price.readOnly = true;
+      quantity.readOnly = true;
       upLoad.style.display = 'none';
     }
 
@@ -441,7 +515,7 @@
       readOnlyPage.readOnly = false;
       price.readOnly = false;
       readOnlyCategory.disabled = false;
-
+      quantity.readOnly = false;
     }
   </script>
 
@@ -479,6 +553,7 @@
       var category = document.getElementById("category").value;
       var ipFile = document.getElementById("ipFile").value;
       var checkBook = document.getElementById("checkBookExists").value;
+      var quantity = document.getElementById('quantityBook').value;
 
       if (title == "") {
         alert("Tiêu đề không để trống");
@@ -521,6 +596,11 @@
         return;
       }
 
+      if(quantity == "" ){
+        alert("Chọn số lượng sách trong kho!");
+        return;
+      }
+
       var result = confirm('Bạn có chắc chắn muốn lưu ?')
       if (result == false) {
         return;
@@ -539,6 +619,7 @@
       var category = document.getElementById("category").value;
       var price = document.getElementById("priceBook").value;
       var ipFile = document.getElementById("ipFile").value;
+      var quantity = document.getElementById('quantityBook').value;
 
       if (title == "") {
         alert("Tiêu đề không để trống");
@@ -573,6 +654,11 @@
         return;
       }
 
+      if(quantity == "" ){
+        alert("Chọn số lượng sách trong kho!");
+        return;
+      }
+      
       var result = confirm('Bạn có chắc chắn muốn lưu ?')
       if (result == false) {
         return;
