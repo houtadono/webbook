@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		 <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+		<title>BookShop</title>
+
+		<!-- Google font -->
+		<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+
+		<!-- Bootstrap -->
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css"/>
+
+		<!-- Slick -->
+		<link type="text/css" rel="stylesheet" href="css/slick.css"/>
+		<link type="text/css" rel="stylesheet" href="css/slick-theme.css"/>
+
+		<!-- nouislider -->
+		<link type="text/css" rel="stylesheet" href="css/nouislider.min.css"/>
+
+		<!-- Font Awesome Icon -->
+		<link rel="stylesheet" href="css/font-awesome.min.css">
+		
+		<!-- login -->
+		<!-- Custom stlylesheet -->
+		<link type="text/css" rel="stylesheet" href="css/style.css"/>
+		
+        
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+       <style>
+       		table thead tr th{
+       			text-align: center;
+       		}
+       		table tbody tr th{
+       		
+       		}
+       </style>
+    </head>
+	<body>
+		<!-- HEADER -->
+		<div id="header" style="height: 75px">
+				<!-- container -->
+				<div class="container">
+					<!-- row -->
+					<div class="row">
+						<!-- LOGO -->
+						<div class="col-md-3">
+							<div style="display: flex;margin-top: 10px" class="header-logo">
+								<a href="#"><h1 style="margin-top: 10px;color: white;font-size: 25px">Đơn hàng của bạn</h1></a>
+							</div>
+						</div>
+						<!-- /LOGO -->
+						<!-- ACCOUNT -->
+						<div class="col-md-3 clearfix">
+							<div class="header-ctn">
+								<!-- Wishlist -->
+								<div style="margin-right: 30px" th:if="${session.account!=null}">
+                                    <li style="display: block;"><a href="#" style="font-size: 15px;color: white;"><i class="fa fa-user-o" style="margin-right: 4px;font-size: 16px;color: wheat;"></i>[[${session.account.username}]]</a>
+									<ul class="out-in" style="width: 110px">
+                                       <li><a th:href="@{/logout}" style="font-size: 11px">Đăng xuất</a></li>                                                       
+                                    </ul>
+                                    </li>
+								</div>
+								<div style="margin-right: 30px" th:if="${session.account==null}">
+									<a th:id="login" th:href="@{#logreg-forms}" data-toggle="modal" style="font-size: 13px"><i class="fa fa-user-o" style="font-size: 16px"></i> Tài khoản</a>
+								</div>
+								<!-- /Wishlist -->
+
+								<!-- Cart -->
+								<div class="dropdown">
+									<a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+										<i class="fa fa-shopping-cart"></i>
+										<span>Giỏ hàng</span>
+							           <div class="qty" th:if="${session.size!=null}">[[${session.size}]]</div>
+										
+										<div class="qty" th:if="${session.size==null}">0</div>
+									</a>
+									<div class="cart-dropdown">
+										<div class="cart-list" th:if="${session.cart!=null}">
+									      <th:block th:each="o:${session.cart.items}" >
+											<div class="product-widget">
+												<div class="product-img">
+													<img th:src="@{'/uploads/'+${o.book.image}}" alt="">
+												</div>
+												<div class="product-body">
+													<h3 class="product-name"><a href="#">[[${o.book.title}]]</a></h3>
+													<h4 class="product-price"><span class="qty">[[${o.quantity}]] x [[${o.price}]]đ</span></h4>
+												</div>
+											</div>
+                                      </th:block>
+											
+										</div>
+										<div class="cart-summary" th:if="${session.cart==null}">
+											<small style="color: red;font-size: 15px">Chưa có sách được chọn</small>
+										</div>
+										<div class="cart-summary" th:if="${session.cart!=null}">
+											<small style="color: red;font-size: 15px">[[${session.cart.items.size}]] loại sách được chọn</small>
+										</div>
+										<div class="cart-btns">
+											<a th:href="@{/addcart}">View Cart</a>
+											<a href="#">Thanh toán  <i class="fa fa-arrow-circle-right"></i></a>
+										</div>
+									</div>
+								</div>
+								<!-- /Cart -->
+
+								<!-- Menu Toogle -->
+								<div class="menu-toggle">
+									<a href="#">
+										<i class="fa fa-bars"></i>
+										<span>Menu</span>
+									</a>
+								</div>
+								<!-- /Menu Toogle -->
+							</div>
+						</div>
+						<!-- /ACCOUNT -->
+					</div>
+					<!-- row -->
+				</div>
+				<!-- container -->
+			</div>
+			<!-- /MAIN HEADER -->
+		</header>
+		<!-- /HEADER -->
+
+		<!-- NAVIGATION -->
+		<nav class="headernav"  style="border-top-color: wheat;border-bottom-color: wheat;height: 50px" id="navigation">
+			<!-- container -->
+			<div class="container" >
+				<!-- responsive-nav -->
+				<div id="responsive-nav"  >
+					<!-- NAV -->
+					<ul class="main-nav nav navbar-nav" style="margin-left: 280px">
+						<li><a style="font-weight: bold;font-size: 15px" th:href="@{/home}">Trang chủ</a></li>
+						<li class = "active" th:if="${active==1}">
+							<a style="font-weight: bold;font-size: 15px" th:href="@{/mypage}">Chờ xác nhận</a>
+						</li>
+						<li th:if="${active!=1}">
+							<a style="font-weight: bold;font-size: 15px" th:href="@{/mypage}">Chờ xác nhận</a>
+						</li>
+                           
+						<li class = "active" th:if="${active==2}">
+							<a style="font-weight: bold;font-size: 15px" th:href="@{/Ordered}">Đã xác nhận</a>
+						</li>
+						
+						<li th:if="${active!=2}">
+							<a style="font-weight: bold;font-size: 15px" th:href="@{/Ordered}">Đã xác nhận</a>
+						</li>
+						
+						<li class = "active" th:if="${active==3}">
+							<a style="font-weight: bold;font-size: 15px" th:href="@{/orderDeleted}">Đã hủy đặt</a>
+						</li>
+						
+						<li th:if="${active!=3}">
+							<a style="font-weight: bold;font-size: 15px" th:href="@{/orderDeleted}">Đã hủy đặt</a>
+						</li>
+						
+						<li class = "active" th:if="${check!=null}">
+							<a style="font-weight: bold;font-size: 15px" th:href="@{/orderDeleted}">Thông tin đơn hàng</a>
+						</li>
+		
+					</ul>
+					<!-- /NAV -->
+				</div>
+				<!-- /responsive-nav -->
+			</div>
+			<!-- /container -->
+		</nav>
+		<!-- /NAVIGATION -->
+		
+		<div class="container" style="width: 100%">   
+         <table class="table table-bordered table-hover" style="width: 100%">
+            <thead class="table-dark">
+                <tr style=" background-color: orange">
+                    <th>Ảnh</th>
+                    <th>Tên Sách</th>
+                    <th>Tác Giả</th>
+                    <th>Thể Loại</th>
+                    <th>Giá Bán</th>
+                    <th>Số Lượng</th>
+                    <th>Thành Tiền</th>
+                    <th>Trạng Thái</th>
+                    <th style="width: 170px" th:if="${check==0}">Hủy Đặt</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="o:${listO}" style="text-align: center">
+                    <td><a th:href="@{'/detail?id='+${o.bid}}"><img style="width: 110px;height: 80px;margin-left: 7px" th:src="@{'/uploads/'+${o.image}}" /></a></td>
+                    <td><div style="margin-top: 30px">[[${o.title}]]</div></td>
+                    <td><div style="margin-top: 30px">[[${o.author}]]</div></td>
+                    <td><div style="margin-top: 30px">[[${o.category}]]</div></td>
+                    <td><div style="margin-top: 30px">[[${o.price}]]</div></td>
+                    <td><div style="margin-top: 30px">[[${o.quantity}]]</div></td>
+                    <td><div style="margin-top: 30px">[[${o.totalMoney}]]đ</div></td>
+                    <td th:if="${check==0}"><div style="margin-top: 30px">Đang chờ duyệt</div></td>
+                    <td th:if="${check==1}"><div style="margin-top: 30px">Đã duyệt</div></td>
+                    <td th:if="${check==0}">
+                        <div style="margin-top: 20px"><a th:href="@{'/deleteOrderLine?oid=' + ${o.oid}} + '&bid=' + ${o.bid} + '&quantity=' + ${o.quantity}"
+                         onclick=" return confirm('Bạn có chắc chắn muốn hủy?')" style="margin-left: 10px;color: white;font-weight: bold"
+                            class="btn btn-danger"><i class="fa fa-minus-circle" style="color: blue;margin-right: 4px"></i>Hủy</a></div>
+                    </td>
+                </tr>
+            </tbody>
+            
+        </table>
+    </div>
+      
+		
+		<!-- jQuery Plugins -->
+		<script src="js/jquery.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/slick.min.js"></script>
+		<script src="js/nouislider.min.js"></script>
+		<script src="js/jquery.zoom.min.js"></script>
+		<script src="js/main.js"></script>
+
+	</body>
+    
+</html>
