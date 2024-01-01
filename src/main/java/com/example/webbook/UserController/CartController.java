@@ -23,13 +23,62 @@ public class CartController {
         Cart cart = dao.getCartByUid(uid);
         return cart;
     }
-    
-	@GetMapping(value = "/addcart")
+
+    @GetMapping(value = "/addcart")
 	public String addCart(Model model,HttpSession session,HttpServletRequest request) {
 		session = request.getSession(true);
 		DAO dao = new DAO();
 		Cart cart = null;
-		Object o = session.getAttribute("cart");
+		Object o = (Cart)session.getAttribute("cart");
+
+		String bnum = request.getParameter("quantity");
+		String id = request.getParameter("bookid");
+        int old_size = cart.getSize();
+
+		int num,bid =0;
+		try {
+			num = Integer.parseInt(bnum);
+			bid = Integer.parseInt(id);
+			Book book = dao.getBookById(bid);
+			Item item = new Item(book, num, book.getPrice()*(100-book.getDiscount())/100 );
+			cart.addItem(item);
+            dao.addItemIntoCart(item);
+		} catch (Exception e) {
+			
+			num = 1;
+		}
+		ArrayList<Item> list = cart.getItems();
+        int count=0;
+        for (Item i : list) {
+            count+=i.getQuantity();
+        }
+        int totalMoney = 0;
+        for (Item i : list) {
+            totalMoney+=i.getQuantity()*i.getPrice();
+        }
+        session.setAttribute("totalMoney", totalMoney);
+        session.setAttribute("cart", cart);
+        session.setAttribute("size", count);
+		LinkedList<String> pageHistory = (LinkedList<String>) session.getAttribute("pageHistory");
+		if (pageHistory == null) {
+			pageHistory = new LinkedList<>();
+		}
+        if(!pageHistory.getFirst().equalsIgnoreCase("addcart"))
+		    pageHistory.addFirst("addcart");
+		int maxHistorySize = 10;
+		while (pageHistory.size() > maxHistorySize) {
+			pageHistory.removeLast();
+		}
+		session.setAttribute("pageHistory", pageHistory);
+		return "/user/cart";
+	}
+
+	@GetMapping(value = "/addcart1")
+	public String addCart1(Model model,HttpSession session,HttpServletRequest request) {
+		session = request.getSession(true);
+		DAO dao = new DAO();
+		Cart cart = null;
+		Object o = (Cart)session.getAttribute("cart");
 		if (o!=null){
             cart = (Cart)o;
         }

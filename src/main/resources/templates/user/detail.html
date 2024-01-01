@@ -277,6 +277,12 @@
 								<div style="display: flex;">
 									<div><label>Tình trạng :</label></div>
 									<div th:if="${book.quantity}>0" id="quantityAvailable">
+										<p style="margin-left: 10px;color: red;">Còn hàng ([[${book.quantity}]])
+											<span th:if="${cart.getItemById(book.id)}!=null">
+												(Trong giỏ:  [[${cart.getItemById(book.id).quantity}]]) 
+												//TODO: 1
+											</span>
+										</p>
 										<p style="margin-left: 10px;color: red;">Còn hàng ([[${book.quantity}]])</p>
 									</div>
 									<div th:if="${book.quantity}<=0" id="quantityAvailable">
@@ -293,7 +299,9 @@
 								<div class="qty-label">
 									Số lượng
 									<div class="input-number">
-										<input type="number" value="1" name="quantity" th:max=${book.quantity}
+										<input th:if="${cart.getItemById(book.id)}==null" type="number" value="1" name="quantity" th:max=${book.quantity}
+											id="quantityInput">
+										<input th:if="${cart.getItemById(book.id)}!=null" type="number" value="1" name="quantity" th:max=${book.quantity-cart.getItemById(book.id).quantity}
 											id="quantityInput">
 										<span class="qty-up">+</span>
 										<span class="qty-down">-</span>
@@ -705,20 +713,23 @@
 		}
 	}
 	var bookQuantity = 1;
-	var quantityElement = document.getElementById("quantityAvailable");
-	if (quantityElement) {
-		var match = quantityElement.textContent.match(/Còn hàng \((\d+)\)/);
+	// var quantityElement = document.getElementById("quantityAvailable");
+	// if (quantityElement) {
+	// 	var match = quantityElement.textContent.match(/Còn hàng \((\d+)\)/);
 
-		var bookQuantity = match[1];
+	// 	var bookQuantity = match[1];
 
-		document.getElementById('quantityInput').setAttribute('max', bookQuantity);
+	// 	document.getElementById('quantityInput').setAttribute('max', bookQuantity);
 
-		document.getElementById('quantityInput').addEventListener('change', function () {
-			var newMax = Math.min(bookQuantity, this.value);
-			this.setAttribute('max', newMax);
-		});
-	}
-
+	// 	document.getElementById('quantityInput').addEventListener('change', function () {
+	// 		var newMax = Math.min(bookQuantity, this.value);
+	// 		this.setAttribute('max', newMax);
+	// 	});
+	// }
+	
+	var maxQuantity = document.getElementById('quantityInput').getAttribute('max');
+	bookQuantity = maxQuantity;
+    console.log('Max Quantity:', maxQuantity);
 
 </script>
 

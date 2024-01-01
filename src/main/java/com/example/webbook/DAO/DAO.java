@@ -863,6 +863,10 @@ public class DAO {
 	public static void main(String[] args) {
 		DAO dao = new DAO();
 
-		dao.deleteBookById(116);
+		// dao.deleteBookById(116);
 	}
+
+    public void addItemIntoCart(Item item) {
+		
+    }
 }
