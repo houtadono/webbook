@@ -2,6 +2,7 @@ package com.example.webbook.UserController;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -21,12 +22,26 @@ import com.example.webbook.entity.Review;
 public class DetailController {
 	@GetMapping(value = "/detail")
 	public String detail(Model model,HttpServletRequest request,HttpSession session) {
+		String book_id = request.getParameter("id");
+
+		session = request.getSession(false);
+		LinkedList<String> pageHistory = (LinkedList<String>) session.getAttribute("pageHistory");
+		if (pageHistory == null) {
+			pageHistory = new LinkedList<>();
+		}
+		if(!pageHistory.getFirst().equalsIgnoreCase("detail?id="+book_id))
+		    pageHistory.addFirst("detail?id="+book_id);
+		int maxHistorySize = 10;
+		while (pageHistory.size() > maxHistorySize) {
+			pageHistory.removeLast();
+		}
+		System.out.println("detail: " + pageHistory);
+		session.setAttribute("pageHistory", pageHistory);
 		DAO dao = new DAO();
 		ArrayList<Category> list1 = new ArrayList<>();
 		list1 = dao.getAllCategory(0);
 		model.addAttribute("listC", list1);
 		
-		String book_id = request.getParameter("id");
 		try {
 			int id = Integer.parseInt(book_id);
 			Book b = dao.getBookById(id);
@@ -120,7 +135,8 @@ public class DetailController {
 		model.addAttribute("Rsize", listReview.size());
 		model.addAttribute("page", page);
 		model.addAttribute("numlist", numlist);
-		
+		model.addAttribute("currentPage", "detail?id="+book_id);
+		// session.setAttribute(str, numlist);
 		return "/user/detail";
 	}
 	
@@ -256,7 +272,7 @@ public class DetailController {
 				Review rv = new Review(ac.getId(), bid, review, rat, day);
 				dao.insertReview(rv);
 			} catch (Exception e) {
-				// TODO: handle exception
+				
 			}
 		}
 		ArrayList<Category> list1 = new ArrayList<>();

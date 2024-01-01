@@ -3,7 +3,30 @@ package com.example.webbook.entity;
 import java.util.ArrayList;
 
 public class Cart {
+    int uid;
     ArrayList<Item> items;
+    int size;
+    int totalMoney;
+
+    public int getUid() {
+        return uid;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public void setUid(int i) {
+        this.uid = i;
+    }
+
+    public void setItems(ArrayList<Item> items) {
+        this.items = items;
+    }
 
     public Cart() {
         items = new ArrayList<>();
@@ -24,6 +47,7 @@ public class Cart {
         }
         return null;
     }
+
     public void addItem(Item t){
         if (getItemById(t.getBook().getId())!=null){
             Item m = getItemById(t.getBook().getId());
@@ -51,6 +75,14 @@ public class Cart {
             }
         }
         return null;
+    }
+
+    public int getTotalMoney() {
+        return totalMoney;
+    }
+
+    public void setTotalMoney(int totalMoney) {
+        this.totalMoney = totalMoney;
     }
 
 }

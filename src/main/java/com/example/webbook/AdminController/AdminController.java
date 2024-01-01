@@ -184,9 +184,9 @@ public class AdminController {
 		try {
 			int oid = Integer.parseInt(id);		
 			listO = dao.getAllOrderLineByOid(oid);		
-			
+			System.out.println(listO);
 		} catch (Exception e) {
-			// TODO: handle exception
+			
 		}
 		model.addAttribute("listO", listO);
 		return "/admin/OrderDetailPending";
@@ -202,7 +202,7 @@ public class AdminController {
 			listO = dao.getAllOrderLineByOid(oid);		
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			
 		}
 		model.addAttribute("listO", listO);
 		return "/admin/OrderedDetail";
@@ -216,7 +216,7 @@ public class AdminController {
 			int o_id = Integer.parseInt(oid);
 			dao.changeStatusOrderByIDForAdmin(o_id);	
 		} catch (Exception e) {
-			// TODO: handle exception
+			
 		}
 		
 		return "redirect:/orderPending";
@@ -231,7 +231,7 @@ public class AdminController {
 			dao.detleteOrderLineByOid(o_id);
 			dao.detleteOrderHistory(o_id);
 		} catch (Exception e) {
-			// TODO: handle exception
+			
 		}
 		
 		return"redirect:/orderPending";
@@ -291,6 +291,7 @@ public class AdminController {
 			@RequestParam("photo")MultipartFile multipartFile,HttpSession session) throws IOException {
 		DAO dao = new DAO();		
 		String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+		System.out.println("save: " + book);
 		if (!fileName.equals("")) {
 			String uploadDir = "uploads/";
 			dao.saveFile(uploadDir, fileName, multipartFile);	
@@ -318,16 +319,13 @@ public class AdminController {
 	public String upDateBook(@ModelAttribute("book") Book book,Model model,@PathVariable int id,
 			@RequestParam("photo")MultipartFile multipartFile,HttpSession session) throws IOException {
 		DAO dao = new DAO();
-		System.out.print("hien ra");
 		String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
 		if (!fileName.equals("")) {
 			String uploadDir = "uploads/";
 			dao.saveFile(uploadDir, fileName, multipartFile);	
-			book.setImage(fileName);
+			book.setImage( fileName);
 		}
-		System.out.print("save book");
-
-		System.out.println(book);
+		System.out.println("update: "+book);
 
 		if(dao.checkBookExistsforEdit(book.getTitle(), book.getAuthor(),book.getId())==1) {
 			ArrayList<Category> listC = new ArrayList<>();
@@ -353,16 +351,20 @@ public class AdminController {
 		String id = request.getParameter("bid");
 		String c_id = request.getParameter("cid");
 		int cid = 0;
+		Book book = new Book();
 		try {
 			int bid = Integer.parseInt(id);
 			cid = Integer.parseInt(c_id);
-			Book book = dao.getBookById(bid);
-			model.addAttribute("book", book);
+			book = dao.getBookById(bid);
+			book.setCid(cid);
 		} catch (Exception e) {
-			// TODO: handle exception
+			
 		}
 		ArrayList<Category> listC = new ArrayList<>();
 		listC = dao.getAllCategoryExcpet(cid);
+		book.setCategory(listC.get(0).getName());
+		System.out.println(book);
+		model.addAttribute("book", book);
 		model.addAttribute("listC", listC);
 		model.addAttribute("checkMethod", 1);
 		
@@ -491,7 +493,7 @@ public class AdminController {
 		    stt = Integer.parseInt(index);	    
 			dao.deleteBookById(bid);
 		} catch (Exception e) {
-			// TODO: handle exception
+			
 		}
 		session.setAttribute("bookIndex", stt);
 		return "redirect:/admin";

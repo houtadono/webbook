@@ -46,52 +46,48 @@
     </head>
 	<body>
 		<!-- HEADER -->
-		<div id="header">
+		<header>
+			<!-- MAIN HEADER -->
+			<div id="header">
 				<!-- container -->
 				<div class="container">
 					<!-- row -->
-					<div class="row">
+					<div class="row row-header">
 						<!-- LOGO -->
-						<div class="col-md-3" style="margin-top:5px">
-							<!-- Wishlist -->
-								<div th:if="${session.account==null}">
-									<a th:id="login" th:href="@{#logreg-forms}" data-toggle="modal" style="font-size: 13px"><i class="fa fa-user-o" style="font-size: 16px"></i> Tài khoản</a>
-								</div>
-								<div style="margin-right: 30px" th:if="${session.account!=null}">
-                                    <li style="display: block;"><a href="#" style="font-size: 26px;color: white;"><i class="fa fa-user-o" style="margin-right: 4px;font-size: 40px;color: wheat;"></i>[[${session.account.username}]]</a>
-									<ul class="out-in" style="width: 110px">
-                                       <li><a th:href="@{/logout}" style="font-size: 11px">Đăng xuất</a></li>                                                       
-                                    </ul>
-                                    </li>
-								</div>
-								<!-- /Wishlist -->
+						<div class="col-md-3">
+							<div style="display: flex;" class="header-logo">
+								<h1 style="margin-top: 10px;color: white;">Sách </h1>
+								<img style="height: 40px;margin-top: 10px;margin-left: 15px;" src="uploads/book1.png">
+							</div>
 						</div>
 						<!-- /LOGO -->
-                        <!-- SEARCH BAR -->
-								<div class="col-md-6">
-									<div class="header-search">
-										<form th:action = "@{/search}">
-											<select class="input-select" style="width: 140px">
-												<option value="0">Danh mục</option>
-													<th:block th:each="o:${listC}">
-												<option th:value="${o.id}"><a th:href="@{/home}">[[${o.name}]]</a></option>
-													</th:block>
-											</select>
-											<input name="search" class="input" placeholder="Bạn tìm gì ?" required="1">
-											<button type="submit" class="search-btn">Tìm Kiếm</button>
-										</form>
-									</div>
-								</div>
-								<!-- /SEARCH BAR -->
+
+						<!-- SEARCH BAR -->
+						<div class="col-md-6">
+							<div class="header-search">
+								<form th:action = "@{/search}">
+									<select class="input-select" style="width: 140px">
+										<option value="0">Danh mục</option>
+										<th:block th:each="o:${listC}">
+										<option th:value="${o.id}"><a th:href="@{/home}">[[${o.name}]]</a></option>
+										</th:block>
+									</select>
+									<input name="search" th:value="${str}" class="input" placeholder="Bạn tìm gì ?" required="1">
+									<button type="submit" class="search-btn">Tìm Kiếm</button>
+								</form>
+							</div>
+						</div>
+						<!-- /SEARCH BAR -->
 						<!-- ACCOUNT -->
 						<div class="col-md-3 clearfix">
-							<div class="header-ctn" style="float:left;">
-								<!-- Cart -->
-								<div class="dropdown">
-									<a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+							
+							<div class="header-ctn" style = "float:left;">
+									<!-- Cart -->	
+									<div class="dropdown">
+									<a th:href="@{/addcart}">
 										<i class="fa fa-shopping-cart"></i>
 										<span>Giỏ hàng</span>
-							           <div class="qty" th:if="${session.size!=null}">[[${session.size}]]</div>
+							           	<div class="qty" th:if="${session.size!=null}">[[${session.size}]]</div>
 										
 										<div class="qty" th:if="${session.size==null}">0</div>
 									</a>
@@ -111,27 +107,45 @@
 											
 										</div>
 										<div class="cart-summary" th:if="${session.cart==null}">
-											<small style="color: red;font-size: 15px">Chưa có sách được chọn</small>
+											<small style="color: red;font-size: 16px">Chưa có sách được chọn</small>
 										</div>
 										<div class="cart-summary" th:if="${session.cart!=null}">
-											<small style="color: red;font-size: 15px">[[${session.cart.items.size}]] loại sách được chọn</small>
+											<small style="color: red;font-size: 16px">[[${session.cart.items.size}]] </small> loại sách được chọn
+											<br>
+											<small style="color: red;font-size: 16px">[[${session.size}]] </small> cuốn sách được thêm vào giỏ
+											<br>
+											<b>Tổng tiền: </b>
+											<small style="color: red;font-size: 16px">
+												<span th:text=" ${#numbers.formatDecimal(session.totalMoney, 0, 'COMMA', 0, 'POINT')}"></span>
+											đ
+											</small>
 										</div>
+
 										<div class="cart-btns">
 											<a th:href="@{/addcart}">View Cart</a>
 											<a th:href="@{/mypage}">Đặt hàng  <i class="fa fa-arrow-circle-right"></i></a>
 										</div>
 									</div>
-								</div>
+									</div>
 								<!-- /Cart -->
-
-								<!-- Menu Toogle -->
-								<div class="menu-toggle">
-									<a href="#">
-										<i class="fa fa-bars"></i>
-										<span>Menu</span>
-									</a>
+								<!-- Wishlist -->
+								<div th:if="${session.account==null}" style="margin-left:50px;">
+									<a th:id="login" th:href="@{#logreg-forms}" data-toggle="modal" style="font-size: 13px"><i class="fa fa-user-o" style="font-size: 16px"></i> Tài khoản</a>
 								</div>
-								<!-- /Menu Toogle -->
+								<div th:if="${session.account!=null}" style="margin-left:50px;">
+									<ul style="margin-right: 20px">
+									<li>
+										<a href="#" style="font-size: 15px;color: white;"><i class="fa fa-user-o" style="margin-right: 4px;font-size: 16px;color: wheat;"></i>[[${session.account.username}]]</a>
+										<ul class="out-in" style="width: 100px">
+											<li><a th:href="@{/mypage}" style="font-size: 11px">Đơn hàng</a></li> 
+											<li><a th:href="@{/logout}" style="font-size: 11px">Đăng xuất</a></li>                                                       
+										</ul>
+									</li>                 
+									</ul>
+								</div>
+								<!-- /Wishlist -->															
+
+								
 							</div>
 						</div>
 						<!-- /ACCOUNT -->
@@ -143,39 +157,29 @@
 			<!-- /MAIN HEADER -->
 		</header>
 		<!-- /HEADER -->
-
 		<!-- NAVIGATION -->
-		<nav class="headernav"  style="border-top-color: wheat;border-bottom-color: wheat;height: 50px" id="navigation">
+		<nav class="headernav"  style="border-top-color: wheat;border-bottom-color: wheat;height: 55px" id="navigation">
 			<!-- container -->
-			<div class="container" >
+			<div class="container">
 				<!-- responsive-nav -->
-				<div id="responsive-nav"  >
+				<div id="responsive-nav" >
 					<!-- NAV -->
-					<ul class="main-nav nav navbar-nav" style="margin-left: 330px">
-						<li><a style="font-weight: bold;font-size: 15px" th:href="@{/home}">Trang chủ</a></li>
-						<li class = "active" th:if="${active==1}">
-							<a style="font-weight: bold;font-size: 15px" th:href="@{/mypage}">Chờ xác nhận</a>
+					<ul class="main-nav">
+						<li>
+							<a th:href="@{/home}">Trang chủ</a>
 						</li>
-						<li th:if="${active!=1}">
-							<a style="font-weight: bold;font-size: 15px" th:href="@{/mypage}">Chờ xác nhận</a>
+						
+						<li th:class="${active == 1 ? 'active' : '' } ">
+							<a th:href="@{/mypage}">Chờ xác nhận</a>
 						</li>
                            
-						<li class = "active" th:if="${active==2}">
-							<a style="font-weight: bold;font-size: 15px" th:href="@{/Ordered}">Đã xác nhận</a>
+						<li th:class="${active == 2 ? 'active' : '' } ">
+							<a th:href="@{/Ordered}">Đã xác nhận</a>
 						</li>
 						
-						<li th:if="${active!=2}">
-							<a style="font-weight: bold;font-size: 15px" th:href="@{/Ordered}">Đã xác nhận</a>
+						<li th:class="${active == 3 ? 'active' : '' } ">
+							<a th:href="@{/orderDeleted}">Đã hủy đặt</a>
 						</li>
-						
-						<li class = "active" th:if="${active==3}">
-							<a style="font-weight: bold;font-size: 15px" th:href="@{/orderDeleted}">Đã hủy đặt</a>
-						</li>
-						
-						<li th:if="${active!=3}">
-							<a style="font-weight: bold;font-size: 15px" th:href="@{/orderDeleted}">Đã hủy đặt</a>
-						</li>
-		
 					</ul>
 					<!-- /NAV -->
 				</div>

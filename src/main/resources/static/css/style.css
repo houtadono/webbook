@@ -292,7 +292,7 @@ textarea.input {
 \*----------------------------*/
 
 .section {
-  padding-top: 30px;
+  /* padding-top: 30px; */
   padding-bottom: 30px;
 }
 
@@ -352,6 +352,9 @@ textarea.input {
   right: 0px;
 }
 
+.row {
+  margin: 10px 0;
+}
 /*----------------------------*\
 	Breadcrumb
 \*----------------------------*/
@@ -437,7 +440,10 @@ textarea.input {
   color: #D10024;
   margin-right: 5px;
 }
-
+.row-header {
+  display: flex;
+  justify-content: space-evenly;
+}
 /*----------------------------*\
 	Logo
 \*----------------------------*/
@@ -544,20 +550,25 @@ textarea.input {
 
 .cart-dropdown {
   position: absolute;
-  width: 300px;
+  width: 340px;
   background: #FFF;
   padding: 15px;
   -webkit-box-shadow: 0px 0px 0px 2px #E4E7ED;
   box-shadow: 0px 0px 0px 2px #E4E7ED;
   z-index: 99;
   right: 0;
-  opacity: 0;
-  visibility: hidden;
+  /* opacity: 0;
+  visibility: hidden; */
+  /* Thêm hiệu ứng hiển thị */
+  display: none;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.dropdown.open>.cart-dropdown {
-  opacity: 1;
-  visibility: visible;
+/* Sử dụng class .dropdown:hover để hiển thị giỏ hàng khi hover */
+.dropdown:hover .cart-dropdown {
+  /* opacity: 1;
+  visibility: visible; */
+  display: block;
 }
 
 .cart-dropdown .cart-list {
@@ -589,7 +600,7 @@ textarea.input {
   margin: 0px -17px -17px;
 }
 
-.cart-dropdown .cart-btns>a {
+.cart-dropdown .cart-btns > a {
   display: inline-block;
   width: calc(50% - 0px);
   padding: 12px;
@@ -601,12 +612,12 @@ textarea.input {
   transition: 0.2s all;
 }
 
-.cart-dropdown .cart-btns>a:first-child {
+.cart-dropdown .cart-btns > a:first-child {
   margin-right: -4px;
   background-color: #1e1f29;
 }
 
-.cart-dropdown .cart-btns>a:hover {
+.cart-dropdown .cart-btns > a:hover {
   opacity: 0.9;
 }
 
@@ -614,6 +625,10 @@ textarea.input {
   border-top: 1px solid #E4E7ED;
   padding-top: 15px;
   padding-bottom: 15px;
+}
+
+.dropdown-toggle:hover {
+  cursor: pointer;
 }
 
 /*=========================================================
@@ -625,17 +640,32 @@ textarea.input {
   border-bottom: 2px solid #E4E7ED;
   border-top: 3px solid #D10024;
 }
-
+.container, #responsive-nav, .main-nav{
+  height: 100%;
+}
 /*----------------------------*\
 	Main nav
 \*----------------------------*/
 
-.main-nav>li+li {
-  margin-left: 30px
+.main-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-.main-nav>li>a {
-  padding: 20px 0px;
+.main-nav > li {
+  display: flex;
+  position: relative;
+  align-items: center;
+  height: 100%;
+}
+
+.main-nav > li > a {
+  margin: auto;
+  margin-top: 18px;
+  font-weight: bold;
+  font-size: 15px
 }
 
 .main-nav>li>a:hover, .main-nav>li>a:focus, .main-nav>li.active>a {
@@ -661,15 +691,44 @@ textarea.input {
   display: none;
 }
 
+.menu-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.4px 2px;
+}
+
 /*----------------------------*\
 	responsive nav
 \*----------------------------*/
-
+.col-md-3 {
+  width: auto !important;
+}
 @media only screen and (max-width: 991px) {
   .header-ctn .menu-toggle {
     display: inline-block;
   }
-  #responsive-nav {
+  .col-md-6{
+    background-color: #39bae6;
+  }
+  .headernav, .container{
+    height: 100% !important;
+    width: 100% !important;
+    margin: 0;
+    padding: 0;
+  }
+  .main-nav{
+    height: 100%;
+    width: 100%;
+    background-color: #39bae6;
+  }
+  .header-ctn {
+    float: right;
+  }
+  .col-md-3 {
+    background-color: #39bae6;
+  }
+  /* #responsive-nav {
     position: fixed;
     left: 0;
     top: 0;
@@ -691,8 +750,8 @@ textarea.input {
     -ms-transform: translateX(0%);
     transform: translateX(0%);
     width: 100%;
-  }
-  .main-nav {
+  } */
+  /* .main-nav {
     margin: 0px;
     float: none;
   }
@@ -706,7 +765,7 @@ textarea.input {
   .main-nav>li>a {
     padding: 15px;
     color: #FFF;
-  }
+  } */
 }
 
 /*=========================================================
@@ -2412,44 +2471,6 @@ li:hover .sub-menu{
   text-align: center;
 }
 
-
-
-.main-nav>li+li {
-  margin-left: 30px
-}
-
-.main-nav>li>div>a {
-  padding: 20px 0px;
-}
-.main-nav>li>div>span {
-  color: white;
-}
-
-.main-nav>li>div>a:hover, .main-nav>li>div>a:focus, .main-nav>li.active>a {
-  color: #D10024;
-  background-color: transparent;
-}
-
-.main-nav>li>div>a:after {
-  content: "";
-  display: block;
-  width: 0%;
-  height: 2px;
-  background-color: #D10024;
-  -webkit-transition: 0.2s all;
-  transition: 0.2s all;
-}
-
-.main-nav>li>div>a:hover:after, .main-nav>li>div>a:focus:after, .main-nav>li>div.active>a:after {
-  width: 100%;
-}
-
-
-
-.product-img{
-  text-align: center;
-}
-
 .product {
   position: relative;
   margin: 15px 0px;
@@ -2462,6 +2483,7 @@ li:hover .sub-menu{
 .product:hover {
   -webkit-box-shadow: 0px 0px 6px 0px #4DD, 0px 0px 0px 2px #e7fff1;
   box-shadow: 0px 0px 6px 0px #4DD, 0px 0px 0px 2px #e7fff1;
+  border-color: #005eff3f !important;
 }
 
 #account{

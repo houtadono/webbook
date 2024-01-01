@@ -1,6 +1,7 @@
 package com.example.webbook.UserController;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -16,7 +17,13 @@ import com.example.webbook.entity.Item;
 
 @Controller
 public class CartController {
-	
+	public Cart getCart(int uid, Model model,HttpSession session, HttpServletRequest request) {
+        session = request.getSession(true);
+        DAO dao = new DAO();
+        Cart cart = dao.getCartByUid(uid);
+        return cart;
+    }
+    
 	@GetMapping(value = "/addcart")
 	public String addCart(Model model,HttpSession session,HttpServletRequest request) {
 		session = request.getSession(true);
@@ -36,10 +43,10 @@ public class CartController {
 			num = Integer.parseInt(bnum);
 			bid = Integer.parseInt(id);
 			Book book = dao.getBookById(bid);
-			Item item = new Item(book, num,book.getPrice());
+			Item item = new Item(book, num, book.getPrice()*(100-book.getDiscount())/100 );
 			cart.addItem(item);
 		} catch (Exception e) {
-			// TODO: handle exception
+			
 			num = 1;
 		}
 		ArrayList<Item> list = cart.getItems();
@@ -54,6 +61,17 @@ public class CartController {
         session.setAttribute("totalMoney", totalMoney);
         session.setAttribute("cart", cart);
         session.setAttribute("size", count);
+		LinkedList<String> pageHistory = (LinkedList<String>) session.getAttribute("pageHistory");
+		if (pageHistory == null) {
+			pageHistory = new LinkedList<>();
+		}
+        if(!pageHistory.getFirst().equalsIgnoreCase("addcart"))
+		    pageHistory.addFirst("addcart");
+		int maxHistorySize = 10;
+		while (pageHistory.size() > maxHistorySize) {
+			pageHistory.removeLast();
+		}
+		session.setAttribute("pageHistory", pageHistory);
 		return "/user/cart";
 	}
 	
@@ -123,6 +141,4 @@ public class CartController {
         session.setAttribute("size", count);
 		return "/user/cart";
 	}
-	
-	
 }

@@ -77,7 +77,10 @@ public class Order {
 	
 	
 
-	public int getStt() {
+	public Order() {
+    }
+
+    public int getStt() {
 		return stt;
 	}
 

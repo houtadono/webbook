@@ -46,7 +46,7 @@
 				<!-- container -->
 				<div class="container">
 					<!-- row -->
-					<div class="row">
+					<div class="row row-header">
 						<!-- LOGO -->
 						<div class="col-md-3">
 							<div style="display: flex;" class="header-logo">
@@ -66,7 +66,7 @@
 										<option th:value="${o.id}"><a th:href="@{/home}">[[${o.name}]]</a></option>
 										</th:block>
 									</select>
-									<input name="search" class="input" placeholder="Bạn tìm gì ?" required="1">
+									<input name="search" th:value="${str}" class="input" placeholder="Bạn tìm gì ?" required="1">
 									<button type="submit" class="search-btn">Tìm Kiếm</button>
 								</form>
 							</div>
@@ -78,7 +78,7 @@
 							<div class="header-ctn" style = "float:left;">
 									<!-- Cart -->	
 									<div class="dropdown">
-									<a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+									<a th:href="@{/addcart}">
 										<i class="fa fa-shopping-cart"></i>
 										<span>Giỏ hàng</span>
 							           	<div class="qty" th:if="${session.size!=null}">[[${session.size}]]</div>
@@ -94,18 +94,36 @@
 												</div>
 												<div class="product-body">
 													<h3 class="product-name"><a href="#">[[${o.book.title}]]</a></h3>
-													<h4 class="product-price"><span class="qty">[[${o.quantity}]] x [[${o.price}]]đ</span></h4>
+													<h4 class="product-price">
+														<span class="qty">
+															Giá:
+														</span>
+														<del th:if="${o.book.discount > 0}" style="font-weight: 100;">[[${o.book.price/1000}]].000 đ</del>
+														<span class="qty" style="font-weight: 600;">
+															[[${(o.price*(100)/100)/1000}]].000 đ
+														</span>
+													</h4>
+													<h4 class="product-price"><span class="qty">Số lượng: </span> [[${o.quantity}]]</h4>
 												</div>
 											</div>
                                       </th:block>
 											
 										</div>
 										<div class="cart-summary" th:if="${session.cart==null}">
-											<small style="color: red;font-size: 15px">Chưa có sách được chọn</small>
+											<small style="color: red;font-size: 16px">Chưa có sách được chọn</small>
 										</div>
 										<div class="cart-summary" th:if="${session.cart!=null}">
-											<small style="color: red;font-size: 15px">[[${session.cart.items.size}]] loại sách được chọn</small>
+											<small style="color: red;font-size: 16px">[[${session.cart.items.size}]] </small> loại sách được chọn
+											<br>
+											<small style="color: red;font-size: 16px">[[${session.size}]] </small> cuốn sách được thêm vào giỏ
+											<br>
+											<b>Tổng tiền: </b>
+											<small style="color: red;font-size: 16px">
+												<span th:text=" ${#numbers.formatDecimal(session.totalMoney, 0, 'COMMA', 0, 'POINT')}"></span>
+											đ
+											</small>
 										</div>
+
 										<div class="cart-btns">
 											<a th:href="@{/addcart}">View Cart</a>
 											<a th:href="@{/mypage}">Đặt hàng  <i class="fa fa-arrow-circle-right"></i></a>
@@ -118,26 +136,19 @@
 									<a th:id="login" th:href="@{#logreg-forms}" data-toggle="modal" style="font-size: 13px"><i class="fa fa-user-o" style="font-size: 16px"></i> Tài khoản</a>
 								</div>
 								<div th:if="${session.account!=null}" style="margin-left:50px;">
-								<ul style="margin-right: 20px">
-                    			<li>
-                        			<a href="#" style="font-size: 15px;color: white;"><i class="fa fa-user-o" style="margin-right: 4px;font-size: 16px;color: wheat;"></i>[[${session.account.username}]]</a>
-                        			<ul class="out-in" style="width: 100px">
-                            			<li><a th:href="@{/mypage}" style="font-size: 11px">Đơn hàng</a></li> 
-                            			<li><a th:href="@{/logout}" style="font-size: 11px">Đăng xuất</a></li>                                                       
-                        			</ul>
-                    			</li>                 
-                				</ul>
+									<ul style="margin-right: 20px">
+									<li>
+										<a href="#" style="font-size: 15px;color: white;"><i class="fa fa-user-o" style="margin-right: 4px;font-size: 16px;color: wheat;"></i>[[${session.account.username}]]</a>
+										<ul class="out-in" style="width: 100px">
+											<li><a th:href="@{/mypage}" style="font-size: 11px">Đơn hàng</a></li> 
+											<li><a th:href="@{/logout}" style="font-size: 11px">Đăng xuất</a></li>                                                       
+										</ul>
+									</li>                 
+									</ul>
 								</div>
 								<!-- /Wishlist -->															
 
-								<!-- Menu Toogle -->
-								<div class="menu-toggle">
-									<a href="#">
-										<i class="fa fa-bars"></i>
-										<span>Menu</span>
-									</a>
-								</div>
-								<!-- /Menu Toogle -->
+								
 							</div>
 						</div>
 						<!-- /ACCOUNT -->
@@ -175,23 +186,31 @@
 				<!-- responsive-nav -->
 				<div id="responsive-nav" >
 					<!-- NAV -->
-					<ul class="main-nav nav navbar-nav">
-						<li class="active"><a th:href="@{/home}" style="font-weight: bold">Trang chủ</a></li>
-						<li><a style="font-weight: bold"  th:href="@{/home}">Tất cả</a></li>
-                            <th:block th:each="o:${listC}">
-							<li style="margin-left: 42px">
-								<div style="height: 19px; background: #53bb8d;text-align: center; width: 30%; margin-left: 70px" th:if="${(o.id==1)||(o.id==3)}"><span class="menu-label">NEW</span></div>
-				                <div style="height: 19px; background: red;text-align: center; width: 36%; margin-left: 60px" th:if="${(o.id==2)||(o.id==4)||(o.id==5)}"><span class="menu-label">SALE</span></div>							
-								<div><a style="font-weight: bold;font-size: 15px" th:href="@{'/category?id='+${o.id}}">[[${o.name}]]</a></div>
-							</li>
-						    </th:block>
-						<li style="display: flex">
-							<div style="margin-top: 18px"><a style="font-weight: bold;font-size: 15px" th:href="@{'category?id='+'2'}">Siêu Sale</a></div>
-							<div><span class="menu-label"><i style="color: red;margin-left: 3px;font-size: 20px" class="fa fa-bullhorn"></i></span></div>
+					<ul class="main-nav">
+						<li th:class="${currentPage == 'home' ? 'active' : ''}">
+							<a th:href="@{/home}" style="font-weight: bold">Trang chủ</a>
 						</li>
 						<li>
-							<div style="background: #53bb8d;margin-left: 70px;width: 40px;text-align: center"><span class="menu-label">Hot</span></div>
-							<div style="height: 2px"><a style="font-weight: bold;font-size: 15px" th:href="@{'category?id='+'5'}">Top bán chạy</a></div>
+							<a th:href="@{/home}">Tất cả</a>
+						</li>
+
+						<th:block th:each="o:${listC}">
+
+							<li th:class="${param.id != null and param.id.toString() == o.id.toString() ? 'active' : '' } ">
+								<div class="menu-label" style="background: #53bb8d;" th:if="${(o.id==1)||(o.id==3)}"><span>NEW</span></div>
+								<div class="menu-label" style="background: red;" th:if="${(o.id==2)||(o.id==4)||(o.id==5)}"><span>SALE</span></div>							
+								<a th:href="@{'/category?id='+${o.id}}">[[${o.name}]]</a>
+							</li>
+
+						</th:block>
+
+						<li th:class="${#strings.equals(currentPage, 'topdiscount') ? 'active' : '' } ">
+							<a th:href="@{'topdiscount'}">Siêu Sale</a>
+							<div class="menu-label"><span><i style="color: red;margin-left: 3px;font-size: 20px" class="fa fa-bullhorn"></i></span></div>
+						</li>
+						<li th:class="${#strings.equals(currentPage, 'topsale') ? 'active' : '' } ">
+							<div class="menu-label" style="background: #53bb8d;"><span>Hot</span></div>
+							<a th:href="@{'topsale'}">Top bán chạy</a>
 						</li>
 					</ul>
 					<!-- /NAV -->
@@ -205,7 +224,10 @@
         <img style="width: 100%" src="uploads/bg1.jpg">
         
 		<!-- SECTION -->
-		<div class="section">
+		<div class="section" th:if="${err!=null && search == 1}"><h3 style="text-align: center;color: red">Không tìm thấy yêu cầu</h3></div>
+		<div class="section" th:if="${err==null && search == 1}">		
+			<h3 style="text-align: center">Kết quả tìm kiếm</h3>
+		</div>
 			<!-- container -->
 			<div class="container-fluid">
 				<!-- row -->
@@ -213,20 +235,29 @@
 					<!-- shop -->
 					<th:block th:each="o:${listS}">
 					<div class="col-md-2 col-xs-6">
-						<div  class="product" >
-							<div style="margin: auto"  class="product-img">
-								<a th:href="@{'/detail?id='+${o.id}}"><img style="height: 165px;margin-top: 10px;width: 100%;" th:src="@{'/uploads/'+${o.image}}" alt=""></a>
-								
+						<div  class="product" style="position: relative; border: 1px solid rgba(70, 131, 180, 0.47);" >
+							<div style="position: relative; margin: auto; padding-top: 14px; overflow: hidden;"  class="product-img">
+								<a th:href="@{'/detail?id='+${o.id}}"><img style="height: 165px;margin-top: 10px;width: 100%; " th:src="@{'/uploads/'+${o.image}}" alt=""></a>
+								<p th:if="${o.quantity <= 0}" style="position: absolute; text-align: center; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-40deg);width: 200%;     background-color: #020202f7;color: #02ebff;padding: 10px 20px;white-space: nowrap;font-size: 16px;font-weight: 600;">
+									Hết hàng
+								</p>
 							</div>
 							<div class="product-body">
 								<div style="height: 30px" class="book-name"><h3 class="product-name"><a style="font-size: 13px" th:href="@{'/detail?id='+${o.id}}">[[${o.title}]]</a></h3></div>
 								<div style="height: 18px">
 									<p style="font-size: 12px">Tác giả : [[${o.author}]]</p>
 								</div>
-								<div style="height: 17px;display: flex">
-									<del style="font-size: 13px;margin-left: 7px">[[${o.price*12/10000}]].000 đ</del><p style="font-size: 14px;color: red;font-weight: bold;margin-left: 5px">[[${o.price/1000}]].000 đ</p>
+								<div style="height: 17px; width: 100%;display: flex; justify-content: center;">
+									<del th:if="${o.discount > 0}" style="font-size: 13px;margin-left: 7px">[[${o.price/1000}]].000 đ</del>
+									<p style="font-size: 14px;color: red;font-weight: bold;margin-left: 5px">
+										[[${(o.price*(100-o.discount)/100)/1000}]].000 đ
+									</p>
 								</div>
 							</div>
+
+							<p th:if="${o.discount > 0}" style="position: absolute; top:0; left: 0; background-color: red; color: white; padding: 2px 8px; font-weight: 800;">
+								 Giảm [[${o.discount}]]%  
+							</p>
 						</div>
 					</div>
 					</th:block>

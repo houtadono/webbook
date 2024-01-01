@@ -17,6 +17,7 @@ public class Book {
 	private int sold;
 	private int rating;
 	private int price;
+	private int discount;
 	public Book() {
 		super();
 	}
@@ -31,7 +32,7 @@ public class Book {
 	}
 
 	public Book(int id, String title, String author, String description, Date day, int page, int cid, String image,
-			int quantity, int sold,int price) {
+			int quantity, int sold,int price, int discount) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -44,6 +45,7 @@ public class Book {
 		this.quantity = quantity;
 		this.sold = sold;
 		this.price = price;
+		this.discount = discount;
 	}
 	public Book(String title, String author, String description, Date day, int page, int cid, String image,
 			int quantity, int sold,int price) {
@@ -201,11 +203,23 @@ public class Book {
 	public void setSold(int sold) {
 		this.sold = sold;
 	}
+	
 	@Override
 	public String toString() {
-		return "Book [id=" + id + ", title=" + title + ", author=" + author + ", description=" + description + ", day="
-				+ day + ", page=" + page + ", cid=" + cid + ", image=" + image + ", quantity=" + quantity + ", sold="
-				+ sold + "]";
+		return "Book [stt=" + stt + ", id=" + id + ", title=" + title + ", author=" + author + ", description="
+				+ description + ", day=" + day + ", page=" + page + ", cid=" + cid + ", category=" + category
+				+ ", image=" + image + ", quantity=" + quantity + ", sold=" + sold + ", rating=" + rating + ", price="
+				+ price + ", discount=" + discount + "]";
+	}
+
+
+	public int getDiscount() {
+		return discount;
+	}
+
+
+	public void setDiscount(int discount) {
+		this.discount = discount;
 	}
 	
 	
