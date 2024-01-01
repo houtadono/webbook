@@ -7,7 +7,7 @@ public class SQLConnection {
         java.sql.Connection connection = null;
         try {
         	Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			connection = DriverManager.getConnection("jdbc:sqlserver://localhost;instanceName=SQLEXPRESS; databaseName=WebBook; user=sa; password=123456; encrypt=false;");
+			connection = DriverManager.getConnection("jdbc:sqlserver://localhost:1433; databaseName=WebBook; user=sa; password=123456; encrypt=false;");
         } catch (Exception e) {
         	System.out.println(e);
         }
