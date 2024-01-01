@@ -591,7 +591,7 @@ public class DAO {
 	            ps.setInt(1, uid);
 	            rs = ps.executeQuery();
 	            if (rs.next()) {
-					cart.setUid(rs.getInt(1));		
+					cart.setOid(rs.getInt(1));		
 					cart.setSize(rs.getInt(2));
 	            }else{
 					String insertOrderQuery = "INSERT INTO Orders (uid, status, quantity) VALUES (?, -2, 0)";
@@ -602,7 +602,7 @@ public class DAO {
 					if (affectedRows > 0) {
 						ResultSet generatedKeys = ps.getGeneratedKeys();
 						if (generatedKeys.next()) {
-							cart.setUid(generatedKeys.getInt(1));
+							cart.setOid(generatedKeys.getInt(1));
 							cart.setSize(0); 
 						}
 					}
@@ -617,7 +617,7 @@ public class DAO {
 			try {
 				conn = new SQLConnection().getConnection();
 				ps = conn.prepareStatement(queryOrderLine);
-				ps.setInt(1, cart.getUid());
+				ps.setInt(1, cart.getOid());
 				rs = ps.executeQuery();
 				int size = 0;
 				int money = 0;
@@ -866,7 +866,45 @@ public class DAO {
 		// dao.deleteBookById(116);
 	}
 
-    public void addItemIntoCart(Item item) {
-		
+    public void addItemIntoCart(int oid, Item item) {
+		// String query = "SELECT quantity FROM orderline WHERE oid = ? AND bid = ?";
+		String checkExistenceQuery = "SELECT * FROM orderline WHERE bid = ? AND oid = ?";
+		int quantity_add = item.getQuantity();
+		int bid = item.getBook().getId();
+		try{
+			conn = new SQLConnection().getConnection();
+			ps = conn.prepareStatement(checkExistenceQuery);
+			ps.setInt(1, oid);
+			ps.setInt(2, bid);
+			ResultSet resultSet = ps.executeQuery();
+			if (resultSet.next()) {
+				// Sách đã tồn tại, cập nhật quantity
+				int existingQuantity = resultSet.getInt("quantity");
+				int newQuantity = existingQuantity + quantity_add;
+
+				// Cập nhật quantity
+				String updateQuantityQuery = "UPDATE orderline SET quantity = ? WHERE bid = ? AND oid = ?";
+				try (PreparedStatement updateQuantityStmt = conn.prepareStatement(updateQuantityQuery)) {
+					updateQuantityStmt.setInt(1, newQuantity);
+					updateQuantityStmt.setInt(2, bid);
+					updateQuantityStmt.setInt(3, oid);
+					updateQuantityStmt.executeUpdate();
+					System.out.println("Đã cập nhật số lượng sách.");
+				}
+			} else {
+				// Sách chưa tồn tại, thêm mới
+				String insertBookQuery = "INSERT INTO orderline (bid, oid, quantity) VALUES (?, ?, ?)";
+				try (PreparedStatement insertBookStmt = conn.prepareStatement(insertBookQuery)) {
+					insertBookStmt.setInt(1, bid);
+					insertBookStmt.setInt(2, oid);
+					insertBookStmt.setInt(3, quantity_add);
+					insertBookStmt.executeUpdate();
+					System.out.println("Đã thêm mới sách.");
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		System.out.println("Thêm vào giỏ thành công");
     }
 }

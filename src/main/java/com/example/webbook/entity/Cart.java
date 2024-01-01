@@ -7,6 +7,7 @@ public class Cart {
     ArrayList<Item> items;
     int size;
     int totalMoney;
+    int oid; 
 
     public int getUid() {
         return uid;
@@ -83,6 +84,14 @@ public class Cart {
 
     public void setTotalMoney(int totalMoney) {
         this.totalMoney = totalMoney;
+    }
+
+    public int getOid() {
+        return oid;
+    }
+
+    public void setOid(int oid) {
+        this.oid = oid;
     }
 
 }

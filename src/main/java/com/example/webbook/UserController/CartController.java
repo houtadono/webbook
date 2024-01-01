@@ -42,7 +42,7 @@ public class CartController {
 			Book book = dao.getBookById(bid);
 			Item item = new Item(book, num, book.getPrice()*(100-book.getDiscount())/100 );
 			cart.addItem(item);
-            dao.addItemIntoCart(item);
+            dao.addItemIntoCart(cart.getUid(), item);
 		} catch (Exception e) {
 			
 			num = 1;
