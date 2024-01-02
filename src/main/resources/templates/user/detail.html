@@ -71,14 +71,15 @@
 					<!-- SEARCH BAR -->
 					<div class="col-md-6">
 						<div class="header-search">
-							<form th:action = "@{/search}">
+							<form th:action="@{/search}">
 								<select class="input-select" style="width: 140px">
 									<option value="0">Danh mục</option>
 									<th:block th:each="o:${listC}">
-									<option th:value="${o.id}"><a th:href="@{/home}">[[${o.name}]]</a></option>
+										<option th:value="${o.id}"><a th:href="@{/home}">[[${o.name}]]</a></option>
 									</th:block>
 								</select>
-								<input name="search" th:value="${str}" class="input" placeholder="Bạn tìm gì ?" required="1">
+								<input name="search" th:value="${str}" class="input" placeholder="Bạn tìm gì ?"
+									required="1">
 								<button type="submit" class="search-btn">Tìm Kiếm</button>
 							</form>
 						</div>
@@ -86,70 +87,86 @@
 					<!-- /SEARCH BAR -->
 					<!-- ACCOUNT -->
 					<div class="col-md-3 clearfix">
-						
-						<div class="header-ctn" style = "float:left;">
-								<!-- Cart -->	
-								<div class="dropdown">
+
+						<div class="header-ctn" style="float:left;">
+							<!-- Cart -->
+							<div class="dropdown">
 								<a th:href="@{/addcart}">
 									<i class="fa fa-shopping-cart"></i>
 									<span>Giỏ hàng</span>
-									   <div class="qty" th:if="${session.size!=null}">[[${session.size}]]</div>
-									
+									<div class="qty" th:if="${session.size!=null}">[[${session.size}]]</div>
+
 									<div class="qty" th:if="${session.size==null}">0</div>
 								</a>
 								<div class="cart-dropdown">
 									<div class="cart-list" th:if="${session.cart!=null}">
-									  <th:block th:each="o:${session.cart.items}" >
-										<div class="product-widget">
-											<div class="product-img">
-												<img th:src="@{'/uploads/'+${o.book.image}}" alt="">
+										<th:block th:each="o:${session.cart.items}">
+											<div class="product-widget">
+												<div class="product-img">
+													<img th:src="@{'/uploads/'+${o.book.image}}" alt="">
+												</div>
+												<div class="product-body">
+													<h3 class="product-name"><a href="#">[[${o.book.title}]]</a></h3>
+													<h4 class="product-price">
+														<span class="qty">
+															Giá:
+														</span>
+														<del th:if="${o.book.discount > 0}" style="font-weight: 100;" th:text=" ${#numbers.formatDecimal(o.book.price, 0, 'COMMA', 0, 'POINT')}">
+														</del>
+														<span class="qty" style="font-weight: 600; margin-right: 0px;" th:text=" ${#numbers.formatDecimal(o.price, 0, 'COMMA', 0, 'POINT')}">
+														</span> đ
+													</h4>
+													<h4 class="product-price"><span class="qty">Số lượng: </span>
+														[[${o.quantity}]]</h4>
+												</div>
 											</div>
-											<div class="product-body">
-												<h3 class="product-name"><a href="#">[[${o.book.title}]]</a></h3>
-												<h4 class="product-price"><span class="qty">[[${o.quantity}]] x [[${o.price}]]đ</span></h4>
-											</div>
-										</div>
-								  </th:block>
-										
+										</th:block>
+
 									</div>
 									<div class="cart-summary" th:if="${session.cart==null}">
 										<small style="color: red;font-size: 16px">Chưa có sách được chọn</small>
 									</div>
 									<div class="cart-summary" th:if="${session.cart!=null}">
-										<small style="color: red;font-size: 16px">[[${session.cart.items.size}]] </small> loại sách được chọn
+										<small style="color: red;font-size: 16px">[[${session.cart.items.size}]]
+										</small> loại sách được chọn
 										<br>
-										<small style="color: red;font-size: 16px">[[${session.size}]] </small> cuốn sách được thêm vào giỏ
+										<small style="color: red;font-size: 16px">[[${session.size}]] </small> cuốn sách
+										được thêm vào giỏ
 										<br>
 										<b>Tổng tiền: </b>
 										<small style="color: red;font-size: 16px">
-											<span th:text=" ${#numbers.formatDecimal(session.totalMoney, 0, 'COMMA', 0, 'POINT')}"></span>
-										đ
+											<span
+												th:text=" ${#numbers.formatDecimal(session.totalMoney, 0, 'COMMA', 0, 'POINT')}"></span>
+											đ
 										</small>
 									</div>
 
 									<div class="cart-btns">
 										<a th:href="@{/addcart}">View Cart</a>
-										<a th:href="@{/mypage}">Đặt hàng  <i class="fa fa-arrow-circle-right"></i></a>
+										<a th:href="@{/checkout}">Đặt hàng <i class="fa fa-arrow-circle-right"></i></a>
 									</div>
 								</div>
-								</div>
+							</div>
 							<!-- /Cart -->
 							<!-- Wishlist -->
 							<div th:if="${session.account==null}" style="margin-left:50px;">
-								<a th:id="login" th:href="@{#logreg-forms}" data-toggle="modal" style="font-size: 13px"><i class="fa fa-user-o" style="font-size: 16px"></i> Tài khoản</a>
+								<a th:id="login" th:href="@{#logreg-forms}" data-toggle="modal"
+									style="font-size: 13px"><i class="fa fa-user-o" style="font-size: 16px"></i> Tài
+									khoản</a>
 							</div>
 							<div th:if="${session.account!=null}" style="margin-left:50px;">
 								<ul style="margin-right: 20px">
-								<li>
-									<a href="#" style="font-size: 15px;color: white;"><i class="fa fa-user-o" style="margin-right: 4px;font-size: 16px;color: wheat;"></i>[[${session.account.username}]]</a>
-									<ul class="out-in" style="width: 100px">
-										<li><a th:href="@{/mypage}" style="font-size: 11px">Đơn hàng</a></li> 
-										<li><a th:href="@{/logout}" style="font-size: 11px">Đăng xuất</a></li>                                                       
-									</ul>
-								</li>                 
+									<li>
+										<a href="#" style="font-size: 15px;color: white;"><i class="fa fa-user-o"
+												style="margin-right: 4px;font-size: 16px;color: wheat;"></i>[[${session.account.username}]]</a>
+										<ul class="out-in" style="width: 100px">
+											<li><a th:href="@{/mypage}" style="font-size: 11px">Đơn hàng</a></li>
+											<li><a th:href="@{/logout}" style="font-size: 11px">Đăng xuất</a></li>
+										</ul>
+									</li>
 								</ul>
 							</div>
-							<!-- /Wishlist -->															
+							<!-- /Wishlist -->
 
 						</div>
 					</div>
@@ -163,30 +180,37 @@
 	</header>
 	<!-- /HEADER -->
 	<!-- login -->
-	<div style="height: 330px" id="logreg-forms" class="modal fade" >
-	   <div  th:if="${session.checkLoginUser!=null}"><input type="text" id="checkLogin" hidden="1" th:value="${session.checkLoginUser}"></input></div>
-		<div style="height: 1px"><a style="margin-left: 325px;text-decoration: none;color: red" th:href="@{/noLogin}">Đóng <i style="color: red" class="fa fa-close"></i></a></div>	
+	<div style="height: 330px" id="logreg-forms" class="modal fade">
+		<div th:if="${session.checkLoginUser!=null}"><input type="text" id="checkLogin" hidden="1"
+				th:value="${session.checkLoginUser}"></input></div>
+		<div style="height: 1px"><a style="margin-left: 325px;text-decoration: none;color: red"
+				th:href="@{/noLogin}">Đóng <i style="color: red" class="fa fa-close"></i></a></div>
 		<form class="form-signin" th:action="@{/login}" th:method="post">
 			<h1 class="h3 mb-3 font-weight-normal" style="text-align: center">Đăng nhập</h1>
-			<input name="user" th:value="${username}" type="text" id="inputEmail" class="form-control" placeholder="Tên đăng nhập" required="1" autofocus="">
-			<input style="margin-top: 15px" name="pass" th:value="${password}" type="password" id="inputPassword" class="form-control" placeholder="Mật khẩu" required="1">
+			<input name="user" th:value="${username}" type="text" id="inputEmail" class="form-control"
+				placeholder="Tên đăng nhập" required="1" autofocus="">
+			<input style="margin-top: 15px" name="pass" th:value="${password}" type="password" id="inputPassword"
+				class="form-control" placeholder="Mật khẩu" required="1">
 			<div style="margin-top: 5px">
-				<input th:checked="${rm}" name="remember" value="1" type="checkbox" class="form-check-input" id="exampleCheck1">
-				<label  class="form-check-label" for="exampleCheck1">Ghi nhớ</label>
+				<input th:checked="${rm}" name="remember" value="1" type="checkbox" class="form-check-input"
+					id="exampleCheck1">
+				<label class="form-check-label" for="exampleCheck1">Ghi nhớ</label>
 			</div>
-			<div style="margin-top: 0px"><small style="margin-left: 100px;color: red" th:if="${session.mess!=null}">[[${session.mess}]]</small>
-			<button style="margin-top: 2px" class="btn btn-success btn-block" type="submit"><i class="fas fa-sign-in-alt"></i> Đăng nhập</button>
+			<div style="margin-top: 0px"><small style="margin-left: 100px;color: red"
+					th:if="${session.mess!=null}">[[${session.mess}]]</small>
+				<button style="margin-top: 2px" class="btn btn-success btn-block" type="submit"><i
+						class="fas fa-sign-in-alt"></i> Đăng nhập</button>
 			</div>
 		</form>
 		<div class="text-center">Bạn chưa có tài khoản? <a th:href="@{/signup}">Đăng ký tại đây</a></div>
 	</div>
 	<!-- /login -->
 	<!-- NAVIGATION -->
-	<nav class="headernav"  style="border-top-color: wheat;border-bottom-color: wheat;height: 55px" id="navigation">
+	<nav class="headernav" style="border-top-color: wheat;border-bottom-color: wheat;height: 55px" id="navigation">
 		<!-- container -->
 		<div class="container">
 			<!-- responsive-nav -->
-			<div id="responsive-nav" >
+			<div id="responsive-nav">
 				<!-- NAV -->
 				<ul class="main-nav">
 					<li th:class="${currentPage == 'home' ? 'active' : ''}">
@@ -199,8 +223,10 @@
 					<th:block th:each="o:${listC}">
 
 						<li>
-							<div class="menu-label" style="background: #53bb8d;" th:if="${(o.id==1)||(o.id==3)}"><span>NEW</span></div>
-							<div class="menu-label" style="background: red;" th:if="${(o.id==2)||(o.id==4)||(o.id==5)}"><span>SALE</span></div>							
+							<div class="menu-label" style="background: #53bb8d;" th:if="${(o.id==1)||(o.id==3)}">
+								<span>NEW</span></div>
+							<div class="menu-label" style="background: red;" th:if="${(o.id==2)||(o.id==4)||(o.id==5)}">
+								<span>SALE</span></div>
 							<a th:href="@{'/category?id='+${o.id}}">[[${o.name}]]</a>
 						</li>
 
@@ -208,7 +234,8 @@
 
 					<li th:class="${#strings.equals(currentPage, 'topdiscount') ? 'active' : '' } ">
 						<a th:href="@{'topdiscount'}">Siêu Sale</a>
-						<div class="menu-label"><span><i style="color: red;margin-left: 3px;font-size: 20px" class="fa fa-bullhorn"></i></span></div>
+						<div class="menu-label"><span><i style="color: red;margin-left: 3px;font-size: 20px"
+									class="fa fa-bullhorn"></i></span></div>
 					</li>
 					<li th:class="${#strings.equals(currentPage, 'topsale') ? 'active' : '' } ">
 						<div class="menu-label" style="background: #53bb8d;"><span>Hot</span></div>
@@ -270,20 +297,31 @@
 								</div>
 								<div style="display: flex;">
 									<h3 style="font-size: 14px;margin-top: 7px;">Giá bán :</h3>
-									<h3
+									<del th:if="${book.discount > 0}" style="font-size: 13px;margin-left: 7px" th:text=" ${#numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'POINT')}">
+									</del>
+									<h3 class="qty" style="margin-left: 7px;font-size: 14px;margin-top: 7px;font-weight: bold;color: red" th:text=" ${#numbers.formatDecimal(book.price*(100-book.discount)/100, 0, 'COMMA', 0, 'POINT') + ' đ'}">
+									</h3>
+									
+									<!-- <del th:if="${book.discount > 0}"
+										style="font-size: 13px;margin-left: 7px">[[${book.price/1000}]].000 đ</del> -->
+									<!-- <p style="font-size: 14px;color: red;font-weight: bold;margin-left: 5px">
+										[[${(book.price*(100-book.discount)/100)/1000}]].000 đ
+									</p> -->
+									<!-- <h3
 										style="margin-left: 7px;font-size: 14px;margin-top: 7px;font-weight: bold;color: red">
-										[[${book.price/1000}]].000 đ</h3>
+										[[${(book.price*(100-book.discount)/100)/1000}]].000 đ
+									</h3> -->
+
 								</div>
 								<div style="display: flex;">
 									<div><label>Tình trạng :</label></div>
 									<div th:if="${book.quantity}>0" id="quantityAvailable">
 										<p style="margin-left: 10px;color: red;">Còn hàng ([[${book.quantity}]])
-											<span th:if="${cart.getItemById(book.id)}!=null">
-												(Trong giỏ:  [[${cart.getItemById(book.id).quantity}]]) 
-												//TODO: 1
+											<span th:if="${incart>0}" style="color: black">
+												[Trong giỏ: [[${incart}]]]
 											</span>
 										</p>
-										<p style="margin-left: 10px;color: red;">Còn hàng ([[${book.quantity}]])</p>
+										<!-- <p style="margin-left: 10px;color: red;">Còn hàng ([[${book.quantity}]])</p> -->
 									</div>
 									<div th:if="${book.quantity}<=0" id="quantityAvailable">
 										<p style="margin-left: 10px;color: red;">Hết hàng</p>
@@ -295,14 +333,15 @@
 								<h3 style="margin-left: 7px;font-size: 14px;margin-top: 7px;font-weight: normal;">
 									[[${book.category}]]</h3>
 							</div>
-							<div th:if="${book.quantity}>0" class="add-to-cart" style="margin-top: 10px;">
+							<div th:if="${book.quantity-incart > 0}" class="add-to-cart" style="margin-top: 10px;">
 								<div class="qty-label">
 									Số lượng
-									<div class="input-number">
-										<input th:if="${cart.getItemById(book.id)}==null" type="number" value="1" name="quantity" th:max=${book.quantity}
-											id="quantityInput">
-										<input th:if="${cart.getItemById(book.id)}!=null" type="number" value="1" name="quantity" th:max=${book.quantity-cart.getItemById(book.id).quantity}
-											id="quantityInput">
+									<div  class="input-number">
+										<input th:if="${incart==0}" type="number" value="1" name="quantity"
+											th:max=${book.quantity} id="quantityInput" readonly>
+										<input th:if="${incart>0}" type="number" value="1" name="quantity"
+											th:max=${book.quantity-incart} id="quantityInput" readonly>
+										
 										<span class="qty-up">+</span>
 										<span class="qty-down">-</span>
 									</div>
@@ -320,10 +359,12 @@
 							<div th:if="${book.quantity}>0">
 
 								<div style="display: flex;margin-top: 13px" th:if="${session.account!=null}">
-									<button type="submit" style="width: 200px;height:40px;text-transform: none"
+									<button th:if="${book.quantity-incart > 0}" type="submit" style="width: 200px;height:40px;text-transform: none"
 										class="btn btn-success"><i style="font-size: 17px"
 											class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng</button>
-
+									<button th:if="${book.quantity-incart == 0}" type="submit" style="width: 200px;height:40px;text-transform: none"
+										class="btn btn-info"><i style="font-size: 17px"
+											class="fa fa-shopping-cart"></i> Xem giỏ hàng</button>
 								</div>
 							</div>
 						</form>
@@ -726,10 +767,10 @@
 	// 		this.setAttribute('max', newMax);
 	// 	});
 	// }
-	
+
 	var maxQuantity = document.getElementById('quantityInput').getAttribute('max');
 	bookQuantity = maxQuantity;
-    console.log('Max Quantity:', maxQuantity);
+	console.log('Max Quantity:', maxQuantity);
 
 </script>
 

@@ -123,6 +123,9 @@
 		.sum {
 			margin-left: 15px;
 		}
+		label {
+			width: 120px;
+		}
 	</style>
 
 </head>
@@ -220,7 +223,7 @@
 
 									<div class="cart-btns">
 										<a th:href="@{/addcart}">View Cart</a>
-										<a th:href="@{/checkout}">Đặt hàng <i class="fa fa-arrow-circle-right"></i></a>
+										<a th:href="@{/mypage}">Đặt hàng <i class="fa fa-arrow-circle-right"></i></a>
 									</div>
 								</div>
 							</div>
@@ -260,12 +263,28 @@
 	<div class="container">
 		<div class="row" style="display: flex; justify-content: space-between; align-items: center;">
 			<a class="btn btn-primary" th:href="@{/prePage?currentPage=addcart}" style="margin-right: auto;">Trở về</a>
-			<h3 style="margin: 0; text-align: center; flex-grow: 1;">Giỏ hàng của bạn</h3>
+			<h3 style="margin: 0; text-align: center; flex-grow: 1;">Thanh toán đơn hàng</h3>
 		</div>
 
+		<h4>1) Thông tin thanh toán</h4>
+		<div style="display: flex; justify-content: center;">
+			<div>
+				<label for="name" >Họ và tên:</label>
+				<input type="text" id="name" name="name" required> <br>
+		
+				<label for="phone">Số điện thoại:</label>
+				<input type="text" id="phone" name="phone" required> <br>
+		
+				<label for="address">Địa chỉ:</label>
+				<input type="text" id="address" name="address" required> <br>
+			</div>
+		</div>
+        
+		<h4>2) Thông tin sản phẩm</h4>
 		<table id="cart" class="table table-hover table-condensed">
 			<thead>
 				<tr>
+                    <th style="text-align: center;">STT</th>
 					<th style="width:10%;text-align: center;">Ảnh</th>
 					<th style="width: 30%;text-align: center;">Tên Sách</th>
 					<th style="width:10%">
@@ -277,12 +296,15 @@
 					<th style="width:20%">
 						<div style="margin-left: 13px">Thành tiền</div>
 					</th>
-					<th style="width:10%">Xóa</th>
 				</tr>
 			</thead>
 			<tbody>
-				<th:block th:each="o:${session.cart.items}">
+				<th:block th:each="o, index :${session.cart.items}">
 					<tr>
+						<td style="text-align: center;">
+							<p style="margin-top: 28px; font-weight: bold;" th:text="${index.index + 1}">
+							</p>
+						</td>
 						<td style="cursor: pointer;" th:onclick="'window.location.href=\'/detail?id=' + ${o.book.id} + '\''">
 
 							<img style="width: 110px;height: 80px;margin-left: 7px"
@@ -298,20 +320,11 @@
 						</td>
 						<td data-th="Quantity">
 							<div style="margin-top: 25px;margin-left: 30px">
-								<a th:href="@{'/process?num=-1'+'&id='+${o.book.id}}"><button style="width:26px; border: none; background-color: white;"
-										class="btnSub">-</button></a>
-								<span style="width:26px; font-weight: bold;" class="btnSub">[[${o.quantity}]]</span>
-								<a th:href="@{'/process?num=1'+'&id='+${o.book.id}}"><button style="width:26px; border: none; background-color: white;"
-										class="btnAdd">+</button></a>
+								<span style="width:26px; font-weight: bold; margin: 0 26px;" class="btnSub">[[${o.quantity}]]</span>
 							</div>
 						</td>
 						<td data-th="Subtotal" class="text-center">
 							<div style="margin-right: 110px;margin-top: 28px" th:text="${#numbers.formatDecimal(o.price*o.quantity, 0, 'COMMA', 0, 'POINT') + ' đ'}"></div>
-						</td>
-						<td class="actions" data-th="">
-							<div style="margin-top: 22px"><a onclick=" return confirm('Bạn có chắc chắn muốn xóa?')"
-									th:href="@{'/delete?id='+${o.book.id}}" class="btn btn-danger btn-sm"><i
-										class="fa fa-trash-o"></i></a></div>
 						</td>
 					</tr>
 				</th:block>
@@ -322,10 +335,12 @@
 				</tr>
 				<tr>
 					<td colspan="4" class="hidden-xs"></td>
-					<td><strong th:text="${'Tổng '+#numbers.formatDecimal(session.totalMoney, 0, 'COMMA', 0, 'POINT') + ' đ'}"></strong></td>
-
-					<td><a th:href="@{/checkout}" class="btn btn-success btn-block"><i
-								class="fa fa-angle-right"></i>Mua hàng</a></td>
+					<td ><strong>Số lượng tổng: [[${session.cart.size}]]</strong></td>
+					<td>
+						<strong th:text="${'Tổng: '+#numbers.formatDecimal(session.totalMoney, 0, 'COMMA', 0, 'POINT') + ' đ'}"></strong>
+						<a onclick="navigateToMypage()" class="btn btn-success btn-block"><i
+							class="fa fa-angle-right"></i>Đặt hàng</a>
+					</td>
 				</tr>
 			</tfoot>
 		</table>
@@ -366,21 +381,27 @@
 		});
 	});
 	function navigateToMypage() {
-		// Get values from input fields
-		var name = document.getElementById('nameInput').value;
-		var phone = document.getElementById('phoneInput').value;
-		var address = document.getElementById('addressInput').value;
+		var name = document.getElementById('name').value;
+		var phone = document.getElementById('phone').value;
+		var address = document.getElementById('address').value;
+		console.log(name + ": " + address+" " + phone);
+		if(name == '' || name == null){
+			alert("Họ và tên không được để trống");
+			return;
+		}
+		if(phone == '' || phone == null){
+			alert("Số điện thoại không được để trống");
+			return;
+		}
+		if(address == '' || address == null){
+			alert("Địa chỉ không được để trống");
+			return;
+		}
 
-		// Build the URL with parameters
-		var url = '/mypage?name=' + encodeURIComponent(name) +
+		var url = '/add/Order?name=' + encodeURIComponent(name) +
 			'&phone=' + encodeURIComponent(phone) +
 			'&address=' + encodeURIComponent(address);
 
-		localStorage.removeItem('name');
-		localStorage.removeItem('address');
-		localStorage.removeItem('phone');
-
-		// Navigate to the URL
 		window.location.href = url;
 	}
 </script>

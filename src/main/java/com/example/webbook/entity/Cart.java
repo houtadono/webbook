@@ -13,6 +13,12 @@ public class Cart {
         return uid;
     }
 
+    @Override
+    public String toString() {
+        return "Cart [uid=" + uid + ", items=" + items + ", size=" + size + ", totalMoney=" + totalMoney + ", oid="
+                + oid + "]";
+    }
+
     public int getSize() {
         return size;
     }
@@ -40,7 +46,7 @@ public class Cart {
     public int getQuantityById(int id){
         return getItemById(id).getQuantity();
     }
-    private Item getItemById(int id){
+    public Item getItemById(int id){
         for (Item i : items) {
             if (i.getBook().getId()==id){
                 return i;
@@ -57,15 +63,22 @@ public class Cart {
             if (quantity_new> max_quantity) {
                 quantity_new = max_quantity;
             }
-            m.setQuantity(quantity_new);          
+            this.size +=  quantity_new - m.getQuantity();
+            this.totalMoney += m.getPrice()*(quantity_new - m.getQuantity());
+            m.setQuantity(quantity_new);
         }
         else{
-            items.add(t);
+            this.totalMoney += t.getPrice()*t.getQuantity();
+            items.add(t);    
+            this.size += t.getQuantity();
         }
     }
     public void removeItem(int id){
         if (getItemById(id)!=null){
-            items.remove(getItemById(id));
+            Item i = getItemById(id);
+            items.remove(i);
+            size -= i.getQuantity();
+            totalMoney -= i.getPrice()*i.getQuantity();
         }
     }
 

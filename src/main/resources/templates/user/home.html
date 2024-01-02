@@ -98,10 +98,16 @@
 														<span class="qty">
 															Giá:
 														</span>
-														<del th:if="${o.book.discount > 0}" style="font-weight: 100;">[[${o.book.price/1000}]].000 đ</del>
-														<span class="qty" style="font-weight: 600;">
+														<!-- <del th:if="${o.book.discount > 0}"
+															style="font-weight: 100;">[[${o.book.price/1000}]].000
+															đ</del> -->
+														<del th:if="${o.book.discount > 0}" style="font-weight: 100;" th:text=" ${#numbers.formatDecimal(o.book.price, 0, 'COMMA', 0, 'POINT')}">
+														</del>
+														<!-- <span class="qty" style="font-weight: 600;">
 															[[${(o.price*(100)/100)/1000}]].000 đ
-														</span>
+														</span> -->
+														<span class="qty" style="font-weight: 600; margin-right: 0px;" th:text=" ${#numbers.formatDecimal(o.price, 0, 'COMMA', 0, 'POINT')}">
+														</span> đ
 													</h4>
 													<h4 class="product-price"><span class="qty">Số lượng: </span> [[${o.quantity}]]</h4>
 												</div>
@@ -126,7 +132,7 @@
 
 										<div class="cart-btns">
 											<a th:href="@{/addcart}">View Cart</a>
-											<a th:href="@{/mypage}">Đặt hàng  <i class="fa fa-arrow-circle-right"></i></a>
+											<a th:href="@{/checkout}">Đặt hàng  <i class="fa fa-arrow-circle-right"></i></a>
 										</div>
 									</div>
 									</div>
@@ -248,9 +254,8 @@
 									<p style="font-size: 12px">Tác giả : [[${o.author}]]</p>
 								</div>
 								<div style="height: 17px; width: 100%;display: flex; justify-content: center;">
-									<del th:if="${o.discount > 0}" style="font-size: 13px;margin-left: 7px">[[${o.price/1000}]].000 đ</del>
-									<p style="font-size: 14px;color: red;font-weight: bold;margin-left: 5px">
-										[[${(o.price*(100-o.discount)/100)/1000}]].000 đ
+									<del th:if="${o.discount > 0}" style="font-size: 13px;margin-left: 7px" th:text=" ${#numbers.formatDecimal(o.price, 0, 'COMMA', 0, 'POINT') + ' đ'}"></del>
+									<p style="font-size: 14px;color: red;font-weight: bold;margin-left: 5px" th:text=" ${#numbers.formatDecimal(o.price*(100-o.discount)/100, 0, 'COMMA', 0, 'POINT') + ' đ'}">
 									</p>
 								</div>
 							</div>

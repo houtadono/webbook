@@ -254,11 +254,11 @@ public class HomeController {
         }
         else {
             session.setAttribute("account", ac);
-			CartController c = new CartController();
-			Cart cart = c.getCart(ac.getId(),model,session,req);
+			Cart cart =dao.getCartByUid(ac.getId());
 			session.setAttribute("totalMoney", cart.getTotalMoney());
 			session.setAttribute("cart", cart);
 			session.setAttribute("size", cart.getSize());
+			System.out.println(cart);
         } 
         session.removeAttribute("checkLoginUser");
 		return "redirect:/home";

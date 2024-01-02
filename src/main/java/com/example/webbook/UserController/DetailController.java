@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import com.example.webbook.DAO.DAO;
 import com.example.webbook.entity.Account;
 import com.example.webbook.entity.Book;
+import com.example.webbook.entity.Cart;
 import com.example.webbook.entity.Category;
+import com.example.webbook.entity.Item;
 import com.example.webbook.entity.Review;
 
 @Controller
@@ -99,8 +101,19 @@ public class DetailController {
 		model.addAttribute("twoStar", twoStar);
 		model.addAttribute("threeStar", threeStar);
 		model.addAttribute("fourStar", fourStar);
-		model.addAttribute("fiveStar", fiveStar);		
-		
+		model.addAttribute("fiveStar", fiveStar);	
+
+		Cart c = (Cart) session.getAttribute("cart");
+		int incart = 0;
+		try{
+			Item it = c.getItemById(Integer.parseInt(book_id));
+			incart = it.getQuantity();		
+		}catch(Exception e){
+			incart = 0;
+		}
+		model.addAttribute("currentPage", "detail?id="+book_id);
+		model.addAttribute("incart", incart);
+
 		// Phân trang review
 		if(listReview.size()==0) {
 			model.addAttribute("Rsize", 0);
@@ -135,7 +148,7 @@ public class DetailController {
 		model.addAttribute("Rsize", listReview.size());
 		model.addAttribute("page", page);
 		model.addAttribute("numlist", numlist);
-		model.addAttribute("currentPage", "detail?id="+book_id);
+		
 		// session.setAttribute(str, numlist);
 		return "/user/detail";
 	}

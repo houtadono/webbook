@@ -545,12 +545,22 @@ public class DAO {
 			ps.setString(7, o.getPhone());
 			ps.setString(8, o.getAddress());
 			rs = ps.executeQuery();
-			System.out.println(ps);
 			ps.executeUpdate();
 		} catch (Exception e) {
 			System.out.println(e);
 		}
+	}
 
+	public void updateCartCheckout(int id, int uid) {
+		String query = "update Orders set quantity = 0 where Orders.id = ? and Orders.uid = ?";
+		try {
+			conn = new SQLConnection().getConnection();
+			ps = conn.prepareStatement(query);
+			ps.setInt(1, id);
+			ps.setInt(2, uid);
+			ps.executeUpdate();
+		} catch (Exception e) {
+		}
 	}
 
 	public void updateOrder(int sl, int money, int oid) {
@@ -585,6 +595,7 @@ public class DAO {
 	public Cart getCartByUid(int uid){
 		Cart cart = new Cart();
 		String queryOrder = "select Orders.id,Orders.quantity from Orders where Orders.uid = ? and Orders.status = -2";
+		cart.setUid(uid);
 		try {
 	            conn = new SQLConnection().getConnection();//mo ket noi voi sql
 	            ps = conn.prepareStatement(queryOrder);
@@ -595,20 +606,26 @@ public class DAO {
 					cart.setSize(rs.getInt(2));
 	            }else{
 					String insertOrderQuery = "INSERT INTO Orders (uid, status, quantity) VALUES (?, -2, 0)";
-					ps = conn.prepareStatement(insertOrderQuery);
-					ps.setInt(1, uid);
-					
-					int affectedRows = ps.executeUpdate();
-					if (affectedRows > 0) {
-						ResultSet generatedKeys = ps.getGeneratedKeys();
-						if (generatedKeys.next()) {
-							cart.setOid(generatedKeys.getInt(1));
-							cart.setSize(0); 
-						}
-					}
+					PreparedStatement ps1 = conn.prepareStatement(insertOrderQuery);
+					ps1.setInt(1, uid);
+					ps1.executeUpdate();
+					cart.setSize(0);
 				}
 	    } catch (Exception e) {
 	    }
+		try {
+	            conn = new SQLConnection().getConnection();//mo ket noi voi sql
+	            ps = conn.prepareStatement(queryOrder);
+	            ps.setInt(1, uid);
+	            rs = ps.executeQuery();
+	            if (rs.next()) {
+					cart.setOid(rs.getInt(1));		
+					cart.setSize(rs.getInt(2));
+	            }
+	    } catch (Exception e) {
+	    }
+
+
 		if(cart.getSize() > 0){
 			String queryOrderLine = "select Orders.id,Book.id, Book.image,Book.title,Book.author,Category.name,Book.price, Book.discount, "
 				+ "OrderLine.quantity,OrderLine.totalMoney\r\n"
@@ -866,17 +883,21 @@ public class DAO {
 		// dao.deleteBookById(116);
 	}
 
-    public void addItemIntoCart(int oid, Item item) {
+    public void addItemIntoCart(Item item, Cart cart) {
 		// String query = "SELECT quantity FROM orderline WHERE oid = ? AND bid = ?";
 		String checkExistenceQuery = "SELECT * FROM orderline WHERE bid = ? AND oid = ?";
 		int quantity_add = item.getQuantity();
 		int bid = item.getBook().getId();
+		int oid = cart.getOid();
+		System.out.println(oid);
+		System.out.println(bid);
 		try{
 			conn = new SQLConnection().getConnection();
 			ps = conn.prepareStatement(checkExistenceQuery);
-			ps.setInt(1, oid);
-			ps.setInt(2, bid);
+			ps.setInt(1, bid);
+			ps.setInt(2, oid);
 			ResultSet resultSet = ps.executeQuery();
+
 			if (resultSet.next()) {
 				// Sách đã tồn tại, cập nhật quantity
 				int existingQuantity = resultSet.getInt("quantity");
@@ -884,27 +905,95 @@ public class DAO {
 
 				// Cập nhật quantity
 				String updateQuantityQuery = "UPDATE orderline SET quantity = ? WHERE bid = ? AND oid = ?";
-				try (PreparedStatement updateQuantityStmt = conn.prepareStatement(updateQuantityQuery)) {
-					updateQuantityStmt.setInt(1, newQuantity);
-					updateQuantityStmt.setInt(2, bid);
-					updateQuantityStmt.setInt(3, oid);
-					updateQuantityStmt.executeUpdate();
-					System.out.println("Đã cập nhật số lượng sách.");
-				}
+				ps = conn.prepareStatement(updateQuantityQuery);
+				ps.setInt(1, newQuantity);
+				ps.setInt(2, bid);
+				ps.setInt(3, oid);
+				ps.executeUpdate();
+				System.out.println("Đã cập nhật số lượng sách.");
 			} else {
 				// Sách chưa tồn tại, thêm mới
-				String insertBookQuery = "INSERT INTO orderline (bid, oid, quantity) VALUES (?, ?, ?)";
-				try (PreparedStatement insertBookStmt = conn.prepareStatement(insertBookQuery)) {
-					insertBookStmt.setInt(1, bid);
-					insertBookStmt.setInt(2, oid);
-					insertBookStmt.setInt(3, quantity_add);
-					insertBookStmt.executeUpdate();
-					System.out.println("Đã thêm mới sách.");
-				}
+				String insertBookQuery = "INSERT INTO orderline (oid, bid, quantity, totalMoney, price) VALUES (?, ?, ?, 0, 0)";
+				ps = conn.prepareStatement(insertBookQuery);
+				ps.setInt(1, oid);
+				ps.setInt(2, bid);
+				ps.setInt(3, quantity_add);
+				ps.executeUpdate();
+				System.out.println("Đã thêm mới sách.");
 			}
+			String queryUpdateCart = "update Orders set quantity = ? where id = ? and uid = ? and status = -2";
+			ps = conn.prepareStatement(queryUpdateCart);
+			ps.setInt(1, cart.getSize());
+			ps.setInt(2, cart.getOid());
+			ps.setInt(3, cart.getUid());
+			ps.executeUpdate();
+
+			System.out.println("Thêm vào giỏ thành công");
 		}catch(Exception e){
 			e.printStackTrace();
+			System.out.println(ps.toString());
+			System.out.println("Lỗi thêm vào giỏ");
 		}
-		System.out.println("Thêm vào giỏ thành công");
+
+    }
+
+	public void editQuantityItem(int new_quantity, Item item, Cart cart) {
+		// String query = "SELECT quantity FROM orderline WHERE oid = ? AND bid = ?";
+		String checkExistenceQuery = "UPDATE orderline set quantity = ? WHERE bid = ? AND oid = ?";
+
+		int bid = item.getBook().getId();
+		int oid = cart.getOid();
+
+		try{
+			conn = new SQLConnection().getConnection();
+			ps = conn.prepareStatement(checkExistenceQuery);
+			ps.setInt(1, new_quantity);
+			ps.setInt(2, bid);			
+			ps.setInt(3, oid);
+			ps.executeUpdate();
+
+			String queryUpdateCart = "update Orders set quantity = ? where id = ? and uid = ? and status = -2";
+			ps = conn.prepareStatement(queryUpdateCart);
+			ps.setInt(1, cart.getSize());
+			ps.setInt(2, cart.getOid());
+			ps.setInt(3, cart.getUid());
+			ps.executeUpdate();
+
+			System.out.println("Sửa số lượng item thành công");
+		}catch(Exception e){
+			e.printStackTrace();
+			System.out.println(ps.toString());
+			System.out.println("Lỗi sửa số lượng item");
+		}
+
+    }
+
+	 public void deleteItemFromCart(Item item, Cart cart) {
+		String checkExistenceQuery = "DELETE FROM orderline WHERE bid = ? AND oid = ?";
+
+		int bid = item.getBook().getId();
+		int oid = cart.getOid();
+
+		try{
+			conn = new SQLConnection().getConnection();
+			ps = conn.prepareStatement(checkExistenceQuery);
+			ps.setInt(1, bid);
+			ps.setInt(2, oid);
+			ps.executeUpdate();
+
+			System.out.println("Xóa 1 item");
+
+			String queryUpdateCart = "update Orders set quantity = ? where id = ? and uid = ? and status = -2";
+			ps = conn.prepareStatement(queryUpdateCart);
+			ps.setInt(1, cart.getSize());
+			ps.setInt(2, cart.getOid());
+			ps.setInt(3, cart.getUid());
+			ps.executeUpdate();
+		}catch(Exception e){
+			e.printStackTrace();
+			System.out.println(ps.toString());
+			System.out.println("Lỗi xóa item");
+		}
+
     }
 }

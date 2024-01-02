@@ -17,23 +17,42 @@ import com.example.webbook.entity.Item;
 
 @Controller
 public class CartController {
-	public Cart getCart(int uid, Model model,HttpSession session, HttpServletRequest request) {
-        session = request.getSession(true);
-        DAO dao = new DAO();
-        Cart cart = dao.getCartByUid(uid);
-        return cart;
-    }
+    @GetMapping(value = "/checkout")
+	public String checkout(Model model,HttpSession session,HttpServletRequest request) {
+		session = request.getSession(true);
+		DAO dao = new DAO();
+		Cart cart = (Cart)session.getAttribute("cart");
+		if (cart != null){
+            session.setAttribute("totalMoney", cart.getTotalMoney());
+            session.setAttribute("cart", cart);
+            session.setAttribute("size", cart.getSize());
+        }
+        
+        // session.setAttribute("totalMoney", totalMoney);
+        // session.setAttribute("cart", cart);
+        // session.setAttribute("size", count);
+		LinkedList<String> pageHistory = (LinkedList<String>) session.getAttribute("pageHistory");
+		if (pageHistory == null) {
+			pageHistory = new LinkedList<>();
+		}
+        if(!pageHistory.getFirst().equalsIgnoreCase("checkout"))
+		    pageHistory.addFirst("checkout");
+		int maxHistorySize = 10;
+		while (pageHistory.size() > maxHistorySize) {
+			pageHistory.removeLast();
+		}
+		session.setAttribute("pageHistory", pageHistory);
+		return "/user/checkout";
+	}
 
     @GetMapping(value = "/addcart")
 	public String addCart(Model model,HttpSession session,HttpServletRequest request) {
 		session = request.getSession(true);
 		DAO dao = new DAO();
-		Cart cart = null;
-		Object o = (Cart)session.getAttribute("cart");
+		Cart cart = (Cart)session.getAttribute("cart");
 
 		String bnum = request.getParameter("quantity");
 		String id = request.getParameter("bookid");
-        int old_size = cart.getSize();
 
 		int num,bid =0;
 		try {
@@ -41,24 +60,19 @@ public class CartController {
 			bid = Integer.parseInt(id);
 			Book book = dao.getBookById(bid);
 			Item item = new Item(book, num, book.getPrice()*(100-book.getDiscount())/100 );
-			cart.addItem(item);
-            dao.addItemIntoCart(cart.getUid(), item);
+			cart.addItem(item); 
+            System.out.println("cart new: "+cart.toString());
+            dao.addItemIntoCart(item, cart);
 		} catch (Exception e) {
 			
-			num = 1;
 		}
-		ArrayList<Item> list = cart.getItems();
-        int count=0;
-        for (Item i : list) {
-            count+=i.getQuantity();
-        }
-        int totalMoney = 0;
-        for (Item i : list) {
-            totalMoney+=i.getQuantity()*i.getPrice();
-        }
-        session.setAttribute("totalMoney", totalMoney);
+
+        session.setAttribute("totalMoney", cart.getTotalMoney());
         session.setAttribute("cart", cart);
-        session.setAttribute("size", count);
+        session.setAttribute("size", cart.getSize());
+        // session.setAttribute("totalMoney", totalMoney);
+        // session.setAttribute("cart", cart);
+        // session.setAttribute("size", count);
 		LinkedList<String> pageHistory = (LinkedList<String>) session.getAttribute("pageHistory");
 		if (pageHistory == null) {
 			pageHistory = new LinkedList<>();
@@ -126,68 +140,56 @@ public class CartController {
 	
 	@GetMapping(value = "/process")
 	public String Process(Model model,HttpServletRequest request,HttpSession session) {
-		session = request.getSession(true);
-        Cart cart = null;
-        Object o = session.getAttribute("cart");
-        if (o != null) {
-            cart = (Cart) o;
-        } else {
-            cart = new Cart();
-        }
+        session = request.getSession(true);
+		DAO dao = new DAO();
+		Cart cart = (Cart)session.getAttribute("cart");
+
         String tnum = request.getParameter("num").trim();
         String tid = request.getParameter("id");
-        int id, num;
+
+		int id, num;
         try {
             id = Integer.parseInt(tid);
             num = Integer.parseInt(tnum);
-            if ((num == -1) && (cart.getQuantityById(id) <= 1)) {
+            Book book = dao.getBookById(id);
+            if ((num < 0) && (cart.getQuantityById(id) <= -num)) {
+                Item itemdelete = cart.getItemById(id);
                 cart.removeItem(id);
+                dao.deleteItemFromCart(itemdelete, cart);
             } else {
-                DAO dao = new DAO();
-                Book p = dao.getBookById(id);
-                Item t = new Item(p, num,p.getPrice());
-                cart.addItem(t);
+                int old_size = cart.getSize();
+                Item item = new Item(book, num, book.getPrice()*(100-book.getDiscount())/100 );
+                cart.addItem(item);
+                if (old_size != cart.getSize()){
+                    int new_quantity = cart.getItemById(id).getQuantity();
+                    dao.editQuantityItem(new_quantity, item, cart);
+                }
             }
         } catch (Exception e) {
 
         }
-        ArrayList<Item> list = cart.getItems();
-        int count = 0;
-        for (Item i : list) {
-            count += i.getQuantity();
-        }
-        
-        int totalMoney = 0;
-        for (Item i : list) {
-            totalMoney+=i.getQuantity()*i.getPrice();
-        }
-        
-        session.setAttribute("totalMoney", totalMoney);
+
+        session.setAttribute("totalMoney", cart.getTotalMoney());
         session.setAttribute("cart", cart);
-        session.setAttribute("size", count);
+        session.setAttribute("size", cart.getSize());
 		return "/user/cart";
 	}
 	
 	@GetMapping(value = "/delete")
 	public String delete(Model model,HttpServletRequest request,HttpSession session) {
-		session = request.getSession(true);
-        Cart cart = null;
-        Object o = session.getAttribute("cart");
-        if (o != null) {
-            cart = (Cart) o;
-        } else {
-            cart = new Cart();
-        }
+        session = request.getSession(true);
+		DAO dao = new DAO();
+		Cart cart = (Cart)session.getAttribute("cart");
+
         int id = Integer.parseInt(request.getParameter("id"));
+        Item itemdelete = cart.getItemById(id);
         cart.removeItem(id);
-        ArrayList<Item> list = cart.getItems();
+        dao.deleteItemFromCart(itemdelete, cart);
+
+        session.setAttribute("totalMoney", cart.getTotalMoney());
         session.setAttribute("cart", cart);
-        ArrayList<Item> listItem = cart.getItems();
-        int count = 0;
-        for (Item i : list) {
-            count += i.getQuantity();
-        }
-        session.setAttribute("size", count);
+        session.setAttribute("size", cart.getSize());
+		
 		return "/user/cart";
 	}
 }

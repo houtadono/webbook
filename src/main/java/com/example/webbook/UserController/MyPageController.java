@@ -2,6 +2,7 @@ package com.example.webbook.UserController;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -23,9 +24,9 @@ public class MyPageController {
 	@GetMapping(value = "/mypage")
 	public String myPgae(HttpSession session,HttpServletRequest request,Model model) {	
 		session = request.getSession(true);
-		String name = request.getParameter("name");
-		String phone = request.getParameter("phone");
-		String address = request.getParameter("address");
+		// String name = request.getParameter("name");
+		// String phone = request.getParameter("phone");
+		// String address = request.getParameter("address");
 		
 		DAO dao = new DAO();
 		Cart cart = null;
@@ -40,40 +41,50 @@ public class MyPageController {
 		Account ac = (Account) session.getAttribute("account");
 		int uid = ac.getId();
 		
-		ArrayList<Item> list = cart.getItems();
-		if (list.size()!=0) {
-			int count = 0;int totalMoney = 0;
-	        for (Item i : list) {
-	            count += i.getQuantity();
-	            totalMoney+=i.getQuantity()*i.getPrice();
-	        }
-			LocalDate localDate = LocalDate.now();
-			String day = String.valueOf(localDate);
-		    int status = 0;
-			Order order = new Order(0,uid, count, day,totalMoney, status);
-			order.setName(name);
-			order.setPhone(phone);
-			order.setAddress(address);
-			dao.insertOrder(order); //TODO: order false, // FIXME
+		// ArrayList<Item> list = cart.getItems();
+		// if (list.size()!=0) {
+		// 	int count = 0;int totalMoney = 0;
+	    //     for (Item i : list) {
+	    //         count += i.getQuantity();
+	    //         totalMoney+=i.getQuantity()*i.getPrice();
+	    //     }
+		// 	LocalDate localDate = LocalDate.now();
+		// 	String day = String.valueOf(localDate);
+		//     int status = 0;
+		// 	Order order = new Order(0,uid, count, day,totalMoney, status);
+		// 	order.setName(name);
+		// 	order.setPhone(phone);
+		// 	order.setAddress(address);
+		// 	dao.insertOrder(order); //TODO: order false, // FIXME
 	        
-			int oid = dao.getLastOrderId();
-			for (Item i : list) {
-				int bid = i.getBook().getId();					
-				int quantity = i.getQuantity();
-				OrderLine orderLine = new OrderLine(oid, bid, quantity,i.getPrice()*i.getQuantity());
-				orderLine.setPrice(i.getPrice());
-				dao.insertOrderLine(orderLine);
-				dao.updateBookSold(bid, quantity);
-			}
-			session.removeAttribute("cart");
-			session.removeAttribute("size");
-		}
+		// 	int oid = dao.getLastOrderId();
+		// 	for (Item i : list) {
+		// 		int bid = i.getBook().getId();					
+		// 		int quantity = i.getQuantity();
+		// 		OrderLine orderLine = new OrderLine(oid, bid, quantity,i.getPrice()*i.getQuantity());
+		// 		orderLine.setPrice(i.getPrice());
+		// 		dao.insertOrderLine(orderLine);
+		// 		dao.updateBookSold(bid, quantity);
+		// 	}
+		// 	session.removeAttribute("cart");
+		// 	session.removeAttribute("size");
+		// }
 		
 		ArrayList<Order> listOder = new ArrayList<>();
 		listOder = dao.getAllOrderStatus0ByUid(uid);
 		model.addAttribute("listO", listOder);
 		model.addAttribute("active", 1);
-		
+		LinkedList<String> pageHistory = (LinkedList<String>) session.getAttribute("pageHistory");
+		if (pageHistory == null) {
+			pageHistory = new LinkedList<>();
+		}
+        if(!pageHistory.getFirst().equalsIgnoreCase("mypage"))
+		    pageHistory.addFirst("mypage");
+		int maxHistorySize = 10;
+		while (pageHistory.size() > maxHistorySize) {
+			pageHistory.removeLast();
+		}
+		session.setAttribute("pageHistory", pageHistory);
 		return "/user/mypage";
 	}
 	
@@ -83,52 +94,48 @@ public class MyPageController {
 		String name = request.getParameter("name");
 		String phone = request.getParameter("phone");
 		String address = request.getParameter("address");
-		
+		System.out.println(name+phone+address);
 		DAO dao = new DAO();
-		Cart cart = null;
-		Object o = session.getAttribute("cart");
-		if (o!=null){
-            cart = (Cart)o;
-        }
+		Cart cart = (Cart) session.getAttribute("cart");
 		
 		Account ac = (Account) session.getAttribute("account");
 		int uid = ac.getId();
 		
 		ArrayList<Item> list = cart.getItems();
 		if (list.size()!=0) {
-			int count = 0;int totalMoney = 0;
-	        for (Item i : list) {
-	            count += i.getQuantity();
-	            totalMoney+=i.getQuantity()*i.getPrice();
-	        }
 			LocalDate localDate = LocalDate.now();
 			String day = String.valueOf(localDate);
 		    int status = 0;
-			Order order = new Order(0,uid, count, day,totalMoney, status);
+			Order order = new Order(cart.getOid(),uid, cart.getSize(), day,cart.getTotalMoney(), status);
 			order.setName(name);
 			order.setPhone(phone);
 			order.setAddress(address);
-			dao.insertOrder(order); //TODO: order false, // FIXME
-	        
-			int oid = dao.getLastOrderId();
+			dao.insertOrder(order); 
+			int new_oid = dao.getLastOrderId();
+	        dao.updateCartCheckout(cart.getOid(), uid);
+			cart.setSize(0);
 			for (Item i : list) {
 				int bid = i.getBook().getId();					
 				int quantity = i.getQuantity();
-				OrderLine orderLine = new OrderLine(oid, bid, quantity,i.getPrice()*i.getQuantity());
+				OrderLine orderLine = new OrderLine(new_oid, bid, quantity,i.getPrice()*i.getQuantity());
 				orderLine.setPrice(i.getPrice());
 				dao.insertOrderLine(orderLine);
+				dao.deleteItemFromCart(i,cart);
 				dao.updateBookSold(bid, quantity);
 			}
-			session.removeAttribute("cart");
-			session.removeAttribute("size");
+			cart.setItems(new ArrayList<Item>());
+			cart.setTotalMoney(0);
 		}
 		
+		session.setAttribute("totalMoney", cart.getTotalMoney());
+        session.setAttribute("cart", cart);
+        session.setAttribute("size", cart.getSize());
+
 		ArrayList<Order> listOder = new ArrayList<>();
 		listOder = dao.getAllOrderStatus0ByUid(uid);
 		model.addAttribute("listO", listOder);
 		model.addAttribute("active", 1);
-		
-		return "/user/mypage";
+		return "redirect:/mypage";
 	}
 
 	@GetMapping(value = "/delete/Order")
