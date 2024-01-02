@@ -175,7 +175,9 @@
             </div>
             <!-- /.sidebar -->
         </aside>
-
+        <div class="row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <a class="btn btn-primary" th:href="@{/admin}" style="margin-right: auto;">Trở về</a>
+        </div>
         <!-- Content Wrapper. Contains page content -->
         <div th:if="${session.checklogin!=null}"><input id="checkLogin" th:value="${checklogin}" hidden="1"></input>
         </div>

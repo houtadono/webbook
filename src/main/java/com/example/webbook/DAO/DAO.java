@@ -64,7 +64,7 @@ public class DAO {
 
 	public ArrayList<Book> getAllBookForAdmin() {
 		ArrayList<Book> list = new ArrayList<>();
-		String query = "select Book.id,Book.title,Book.author,Book.day,Book.page,Book.cid,Category.name,Book.sold,Book.quantity \r\n"
+		String query = "select Book.id,Book.title,Book.author,Book.day,Book.page,Book.cid,Category.name,Book.sold,Book.quantity,Book.price,Book.discount \r\n"
 				+ "from Book inner join Category on Book.cid = Category.id";
 		try {
 			conn = new SQLConnection().getConnection();// mo ket noi voi sql
@@ -75,7 +75,8 @@ public class DAO {
 				Book b = new Book(stt, rs.getInt(1), rs.getString(2), rs.getString(3), rs.getDate(4), rs.getInt(5),
 						rs.getInt(6), rs.getString(7), rs.getInt(8));
 				b.setQuantity(rs.getInt(9));
-
+				b.setPrice(rs.getInt(10));				
+				b.setDiscount(rs.getInt(11));
 				list.add(b);
 
 				stt++;
@@ -87,7 +88,7 @@ public class DAO {
 
 	public ArrayList<Book> getAllBookForAdminBySearch(String str) {
 		ArrayList<Book> list = new ArrayList<>();
-		String query = "select Book.id,Book.title,Book.author,Book.day,Book.page,Book.cid,Category.name,Book.sold \r\n"
+		String query = "select Book.id,Book.title,Book.author,Book.day,Book.page,Book.cid,Category.name,Book.sold, Book.quantity,Book.price, Book.discount \r\n"
 				+ "from Book inner join Category on Book.cid = Category.id and Book.title like ?";
 		try {
 			conn = new SQLConnection().getConnection();// mo ket noi voi sql
@@ -96,9 +97,13 @@ public class DAO {
 			rs = ps.executeQuery();
 			int stt = 1;
 			while (rs.next()) {
-				list.add(new Book(stt, rs.getInt(1), rs.getString(2), rs.getString(3), rs.getDate(4), rs.getInt(5),
-						rs.getInt(6), rs.getString(7), rs.getInt(8)));
-				stt++;
+				Book b = new Book(stt, rs.getInt(1), rs.getString(2), rs.getString(3), rs.getDate(4), rs.getInt(5),
+						rs.getInt(6), rs.getString(7), rs.getInt(8));
+				b.setQuantity(rs.getInt(9));
+				b.setPrice(rs.getInt(10));				
+				b.setDiscount(rs.getInt(11));
+				list.add(b);
+				stt++;		
 			}
 		} catch (Exception e) {
 		}
@@ -663,6 +668,28 @@ public class DAO {
 	    return cart;
 	 }
 
+	public Order getOrderByOid(int oid, int status){
+		Order order = new Order();
+		String query = "SELECT  [quantity],[date],[totalmoney],[name],[phone],[address] FROM [Orders] where id = ?";
+		try {
+			conn = new SQLConnection().getConnection();// mo ket noi voi sql
+			ps = conn.prepareStatement(query);
+			ps.setInt(1, oid);
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				order.setQuantity(rs.getInt(1));
+				order.setDay(rs.getString(2));
+				order.setTotalMoney(rs.getInt(3));
+				order.setName(rs.getString(4));
+				order.setPhone(rs.getString(5));
+				order.setAddress(rs.getString(6));
+				order.setId(oid);
+			}
+		} catch (Exception e) {
+		}
+		return order;
+	}
+
 	public ArrayList<OrderLine> getAllOrderLineByOid(int oid) {
 		ArrayList<OrderLine> list = new ArrayList<>();
 		String query = "select Orders.id,Book.id, Book.image,Book.title,Book.author,Category.name,OrderLine.price ,OrderLine.quantity,OrderLine.totalMoney\r\n"
@@ -826,8 +853,16 @@ public class DAO {
 			ps = conn.prepareStatement(query);
 			ps.setInt(1, code);
 			ps.executeUpdate();
+			String q = "SELECT  [bid],[quantity] FROM [OrderLine] where oid = ?";
+			ps = conn.prepareStatement(q);
+			ps.setInt(1, code);
+			ResultSet rs = ps.executeQuery();
+			while(rs.next()){
+				updateBookSoldforDeleteOrder(rs.getInt(1), rs.getInt(2));
+			}
 		} catch (Exception e) {
 		}
+
 	}
 
 	public void changeStatusOrderByIDForAdmin(int code) {

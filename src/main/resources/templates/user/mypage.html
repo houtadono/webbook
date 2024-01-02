@@ -56,10 +56,10 @@
 				<div class="row row-header">
 					<!-- LOGO -->
 					<div class="col-md-3">
-						<div style="display: flex;" class="header-logo">
+						<a th:href="@{/home}" style="display: flex;" class="header-logo">
 							<h1 style="margin-top: 10px;color: white;">Sách </h1>
 							<img style="height: 40px;margin-top: 10px;margin-left: 15px;" src="uploads/book1.png">
-						</div>
+						</a>
 					</div>
 					<!-- /LOGO -->
 
@@ -154,9 +154,9 @@
 									<li>
 										<a href="#" style="font-size: 15px;color: white;"><i class="fa fa-user-o"
 												style="margin-right: 4px;font-size: 16px;color: wheat;"></i>[[${session.account.username}]]</a>
-										<ul class="out-in" style="width: 100px">
-											<li><a th:href="@{/mypage}" style="font-size: 11px">Đơn hàng</a></li>
-											<li><a th:href="@{/logout}" style="font-size: 11px">Đăng xuất</a></li>
+										<ul class="out-in" style="padding:0; box-shadow: 0px 0px 0px 2px #E4E7ED;">  
+											<li style="height: auto; padding: 0;"><a class="btn btn-info" th:href="@{/mypage}" style="font-size: 14px; width: 100%;border-radius: 0;">Đơn hàng</a></li>
+											<li style="height: auto; padding: 0;"><a class="btn btn-danger" th:href="@{/logout}" style="font-size: 14px; width: 100%;border-radius: 0;">Đơn hàng</a></li>
 										</ul>
 									</li>
 								</ul>
@@ -224,7 +224,7 @@
 					<th>Trạng Thái</th>
 					<th style="width: 170px" th:if="${active==1}">Chi Tiết / Hủy Đặt</th>
 					<th style="width: 120px" th:if="${active==2}">Chi Tiết</th>
-					<th style="width: 170px" th:if="${active==3}">Đặt Lại / Xóa</th>
+					<th style="width: auto;" th:if="${active==3}">Chi Tiết /Đặt Lại / Xóa</th>
 				</tr>
 			</thead>
 
@@ -249,7 +249,7 @@
 						<div style="margin-top: 15px">[[${o.quantity}]]</div>
 					</td>
 					<td>
-						<div style="margin-top: 15px">[[${o.totalMoney}]]đ</div>
+						<div style="margin-top: 15px" th:text="${#numbers.formatDecimal(o.totalMoney, 0, 'COMMA', 0, 'POINT') + ' đ'}"></div>
 					</td>
 					<td th:if="${active==1}">
 						<div style="margin-top: 15px">Đang chờ duyệt</div>
@@ -278,13 +278,17 @@
 									style="color: blue;margin-right: 4px"></i>Xem</a></div>
 					</td>
 
-					<td style="display: flex;width: 195px" th:if="${active==3}">
-						<div style="display: flex;width: 170px;margin-top: 5px;margin-left: 8px"><a
+					<td style="display: flex; width: 100%;" th:if="${active==3}">
+						<div style="display: flex;margin-top: 5px;margin-left: 13px"><a
+							th:href="@{'/OrderDetail?oid=' + ${o.id}} +'&check=' +'-1'" class="btn btn-success"
+							style="color: white;font-weight: bold"><i class="fa fa-eye"
+								style="color: blue;margin-right: 4px"></i>Xem</a></div>
+						<div style="display: flex;margin-top: 5px;margin-left: 8px"><a
 								th:href="@{'/restoreOrder?oid=' + ${o.id}}"
 								onclick=" return confirm('Bạn có chắc chắn muốn mua lại?')" class="btn btn-success"
 								style="color: white;font-weight: bold"><i class="fa fa-history"
-									style="color: blue;margin-right: 4px"></i>Đặt</a></div>
-						<div style="display: flex;width: 220px;margin-top: 5px"><a
+									style="color: blue;margin: 0 4px"></i>Đặt</a></div>
+						<div style="display: flex;margin-top: 5px"><a
 								th:href="@{'/deleteOrderDelete?oid=' + ${o.id}}"
 								onclick=" return confirm('Bạn có chắc chắn muốn xóa?')"
 								style="margin-left: 10px;color: white;font-weight: bold" class="btn btn-danger"><i

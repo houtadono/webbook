@@ -141,10 +141,10 @@
 				<div class="row row-header">
 					<!-- LOGO -->
 					<div class="col-md-3">
-						<div style="display: flex;" class="header-logo">
+						<a th:href="@{/home}" style="display: flex;" class="header-logo">
 							<h1 style="margin-top: 10px;color: white;">Sách </h1>
 							<img style="height: 40px;margin-top: 10px;margin-left: 15px;" src="uploads/book1.png">
-						</div>
+						</a>
 					</div>
 					<!-- /LOGO -->
 
@@ -239,9 +239,9 @@
 									<li>
 										<a href="#" style="font-size: 15px;color: white;"><i class="fa fa-user-o"
 												style="margin-right: 4px;font-size: 16px;color: wheat;"></i>[[${session.account.username}]]</a>
-										<ul class="out-in" style="width: 100px">
-											<li><a th:href="@{/mypage}" style="font-size: 11px">Đơn hàng</a></li>
-											<li><a th:href="@{/logout}" style="font-size: 11px">Đăng xuất</a></li>
+										<ul class="out-in" style="padding:0; box-shadow: 0px 0px 0px 2px #E4E7ED;">  
+											<li style="height: auto; padding: 0;"><a class="btn btn-info" th:href="@{/mypage}" style="font-size: 14px; width: 100%;border-radius: 0;">Đơn hàng</a></li>
+											<li style="height: auto; padding: 0;"><a class="btn btn-danger" th:href="@{/logout}" style="font-size: 14px; width: 100%;border-radius: 0;">Đơn hàng</a></li>
 										</ul>
 									</li>
 								</ul>
@@ -262,7 +262,7 @@
 	<!-- /HEADER -->
 	<div class="container">
 		<div class="row" style="display: flex; justify-content: space-between; align-items: center;">
-			<a class="btn btn-primary" th:href="@{/prePage?currentPage=addcart}" style="margin-right: auto;">Trở về</a>
+			<a class="btn btn-primary" th:href="@{/prePage?currentPage=checkout}" style="margin-right: auto;">Trở về</a>
 			<h3 style="margin: 0; text-align: center; flex-grow: 1;">Thanh toán đơn hàng</h3>
 		</div>
 
@@ -281,7 +281,7 @@
 		</div>
         
 		<h4>2) Thông tin sản phẩm</h4>
-		<table id="cart" class="table table-hover table-condensed">
+		<table id="cart_order" class="table table-hover table-condensed">
 			<thead>
 				<tr>
                     <th style="text-align: center;">STT</th>
@@ -299,7 +299,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<th:block th:each="o, index :${session.cart.items}">
+				<th:block th:each="o, index :${session.cart_order.items}">
 					<tr>
 						<td style="text-align: center;">
 							<p style="margin-top: 28px; font-weight: bold;" th:text="${index.index + 1}">
@@ -335,9 +335,9 @@
 				</tr>
 				<tr>
 					<td colspan="4" class="hidden-xs"></td>
-					<td ><strong>Số lượng tổng: [[${session.cart.size}]]</strong></td>
+					<td ><strong>Số lượng tổng: [[${session.cart_order.size}]]</strong></td>
 					<td>
-						<strong th:text="${'Tổng: '+#numbers.formatDecimal(session.totalMoney, 0, 'COMMA', 0, 'POINT') + ' đ'}"></strong>
+						<strong th:text="${'Tổng: '+#numbers.formatDecimal(session.cart_order.totalMoney, 0, 'COMMA', 0, 'POINT') + ' đ'}"></strong>
 						<a onclick="navigateToMypage()" class="btn btn-success btn-block"><i
 							class="fa fa-angle-right"></i>Đặt hàng</a>
 					</td>
@@ -348,38 +348,38 @@
 
 </body>
 <script>
-	document.addEventListener('DOMContentLoaded', function () {
-		// Get references to input elements
-		var nameInput = document.getElementById('nameInput');
-		var phoneInput = document.getElementById('phoneInput');
-		var addressInput = document.getElementById('addressInput');
+	// document.addEventListener('DOMContentLoaded', function () {
+	// 	// Get references to input elements
+	// 	var nameInput = document.getElementById('nameInput');
+	// 	var phoneInput = document.getElementById('phoneInput');
+	// 	var addressInput = document.getElementById('addressInput');
 
-		// Load data from localStorage if available
-		if (localStorage.getItem('name')) {
-			nameInput.value = localStorage.getItem('name');
-		}
+	// 	// Load data from localStorage if available
+	// 	if (localStorage.getItem('name')) {
+	// 		nameInput.value = localStorage.getItem('name');
+	// 	}
 
-		if (localStorage.getItem('phone')) {
-			phoneInput.value = localStorage.getItem('phone');
-		}
+	// 	if (localStorage.getItem('phone')) {
+	// 		phoneInput.value = localStorage.getItem('phone');
+	// 	}
 
-		if (localStorage.getItem('address')) {
-			addressInput.value = localStorage.getItem('address');
-		}
+	// 	if (localStorage.getItem('address')) {
+	// 		addressInput.value = localStorage.getItem('address');
+	// 	}
 
-		// Add event listeners to input fields
-		nameInput.addEventListener('input', function () {
-			localStorage.setItem('name', nameInput.value);
-		});
+	// 	// Add event listeners to input fields
+	// 	nameInput.addEventListener('input', function () {
+	// 		localStorage.setItem('name', nameInput.value);
+	// 	});
 
-		phoneInput.addEventListener('input', function () {
-			localStorage.setItem('phone', phoneInput.value);
-		});
+	// 	phoneInput.addEventListener('input', function () {
+	// 		localStorage.setItem('phone', phoneInput.value);
+	// 	});
 
-		addressInput.addEventListener('input', function () {
-			localStorage.setItem('address', addressInput.value);
-		});
-	});
+	// 	addressInput.addEventListener('input', function () {
+	// 		localStorage.setItem('address', addressInput.value);
+	// 	});
+	// });
 	function navigateToMypage() {
 		var name = document.getElementById('name').value;
 		var phone = document.getElementById('phone').value;

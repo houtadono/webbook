@@ -357,7 +357,7 @@ public class DetailController {
 			model.addAttribute("Rsize", 0);
 			model.addAttribute("page", 1);
 			model.addAttribute("reviewActive", 1);
-			return "/user/detail";
+			return "redirect:/detail?id="+id;
 		}
 		int page,numpage = 3;
 		int num = (listReview.size()%3==0)?listReview.size()/3:listReview.size()/3+1;
@@ -386,7 +386,7 @@ public class DetailController {
 		model.addAttribute("page", page);
 		model.addAttribute("numlist", numlist);		
 		model.addAttribute("reviewActive", 1);
-		return "/user/detail";
+		return "redirect:/detail?id="+id;
+
 	}
-	
 }

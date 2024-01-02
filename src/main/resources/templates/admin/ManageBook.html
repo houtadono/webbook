@@ -192,9 +192,9 @@
                   <th>Tiêu Đề</th>
                   <th>Tác Giả</th>
                   <th>Thể Loại</th>
-                  <th>Ngày Phát Hành</th>
+                  <th>Giá gốc</th>
+                  <th>Giảm giá(%)</th>
                   <th>Tồn kho</th>
-                  <th>Số Trang</th>
                   <th>Đã Bán</th>
                   <th style="width: 100px" th:if="${session.accountAdmin!=null}">Xem / Xóa</th>
               </tr>
@@ -206,9 +206,9 @@
                   <td>[[${o.title}]]</td>
                   <td>[[${o.author}]]</td>
                   <td>[[${o.category}]]</td>
-                  <td>[[${o.day}]]</td>
+                  <td>[[${o.price}]]</td>
+                  <td>[[${o.discount}]]</td>
                   <td>[[${o.quantity}]]</td>
-                  <td>[[${o.page}]]</td>
                   <td>[[${o.sold}]]</td>
                     <td style="display: flex;width: 187px" th:if="${session.accountAdmin!=null}">
                         <div style="display: flex;width: 178px;margin-left: 3px"><a th:href="@{'/viewBook?bid='+${o.id}+'&cid='+${o.cid}}" class="btn btn-warning" style="color: white;font-weight: bold"><i class="fa fa-eye" style="color: blue;margin-right: 2px"></i>Xem</a></div>

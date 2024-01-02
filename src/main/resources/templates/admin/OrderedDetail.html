@@ -38,7 +38,9 @@
         .table tbody tr td {
             text-align: center;
         }
-    
+        label{
+      width: 160px;
+    }
 </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -131,7 +133,33 @@
     <!-- /.sidebar -->
   </aside>
   <div class="content-wrapper">
-       <div class="container">   
+    <div class="container">  
+     <div class="row" style="display: flex; justify-content: space-between; align-items: center;">
+       <a class="btn btn-primary" th:href="@{/orderedList}" style="margin-right: auto;">Trở về</a>
+     </div>
+     <div style="display: flex; justify-content: space-evenly; margin-top: 10px;">
+       <div>
+         <label for="name">Họ và tên:</label>
+         <input type="text" id="name" name="name" th:value="${order.name}" readonly> <br>
+ 
+         <label for="phone">Số điện thoại:</label>
+         <input type="text" id="phone" name="phone" th:value="${order.phone}" readonly> <br>
+ 
+         <label for="address">Địa chỉ:</label>
+         <input type="text" id="address" name="address" th:value="${order.address}" readonly> <br>
+       </div>
+       <div>
+         <label for="day">Ngày đặt:</label>
+         <input type="text" id="day" name="day" th:value="${order.day}" readonly> <br>
+ 
+         <label for="quantity">Số lượng sản phẩm :</label>
+         <input type="text" id="quantity" name="quantity" th:value="${order.quantity}" readonly> <br>
+ 
+         <label for="money">Tổng giá trị đơn:</label>
+         <input type="text" id="money" name="money"
+           th:value=" ${#numbers.formatDecimal(order.totalMoney, 0, 'COMMA', 0, 'POINT')+' đ' }" readonly> <br>
+       </div>
+     </div>   
          <table class="table table-bordered table-hover" style="width: 100%">
             <thead class="table-dark">
                 <tr style=" background-color: orange">

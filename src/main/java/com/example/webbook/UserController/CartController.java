@@ -2,6 +2,7 @@ package com.example.webbook.UserController;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -18,16 +19,37 @@ import com.example.webbook.entity.Item;
 @Controller
 public class CartController {
     @GetMapping(value = "/checkout")
-	public String checkout(Model model,HttpSession session,HttpServletRequest request) {
+	public String checkout(Model model,HttpSession session,HttpServletRequest request) throws CloneNotSupportedException {
 		session = request.getSession(true);
-		DAO dao = new DAO();
 		Cart cart = (Cart)session.getAttribute("cart");
 		if (cart != null){
             session.setAttribute("totalMoney", cart.getTotalMoney());
             session.setAttribute("cart", cart);
             session.setAttribute("size", cart.getSize());
         }
-        
+		Cart cart_order = new Cart();
+		cart_order.setOid(cart.getOid());
+		cart_order.setUid(cart.getUid());
+		cart_order.setSize(cart.getSize());
+		cart_order.setItems((ArrayList<Item>) cart.getItems().clone());
+		cart_order.setTotalMoney(cart.getTotalMoney());
+		String selectItem = request.getParameter("array");
+		if(selectItem != null){
+			String[] stringArray = selectItem.split(",");
+			 List<Integer> idsToKeep = new ArrayList<>();
+			for (String ids : stringArray) {
+				int bid = Integer.parseInt(ids);
+				idsToKeep.add(bid);
+			}
+			List<Item> itemsToRemove = new ArrayList<>(cart_order.getItems());
+
+			for (Item item : itemsToRemove) {
+				int bid = item.getBook().getId();
+				if (!idsToKeep.contains(bid)) {
+					cart_order.removeItem(bid);
+				}
+			}
+		}
         // session.setAttribute("totalMoney", totalMoney);
         // session.setAttribute("cart", cart);
         // session.setAttribute("size", count);
@@ -41,6 +63,7 @@ public class CartController {
 		while (pageHistory.size() > maxHistorySize) {
 			pageHistory.removeLast();
 		}
+		session.setAttribute("cart_order", cart_order);
 		session.setAttribute("pageHistory", pageHistory);
 		return "/user/checkout";
 	}

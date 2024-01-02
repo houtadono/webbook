@@ -2,12 +2,12 @@ package com.example.webbook.entity;
 
 import java.util.ArrayList;
 
-public class Cart {
-    int uid;
-    ArrayList<Item> items;
-    int size;
-    int totalMoney;
-    int oid; 
+public class Cart implements Cloneable {
+    private int uid;
+    private ArrayList<Item> items;
+    private int size;
+    private int totalMoney;
+    private int oid; 
 
     public int getUid() {
         return uid;
@@ -107,4 +107,28 @@ public class Cart {
         this.oid = oid;
     }
 
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        // TODO Auto-generated method stub
+        return super.clone();
+    }
+
+    @Override
+    public boolean equals(Object arg0) {
+        // TODO Auto-generated method stub
+        return super.equals(arg0);
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        // TODO Auto-generated method stub
+        super.finalize();
+    }
+
+    @Override
+    public int hashCode() {
+        // TODO Auto-generated method stub
+        return super.hashCode();
+    }
+   
 }

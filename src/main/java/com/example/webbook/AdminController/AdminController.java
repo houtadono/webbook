@@ -181,13 +181,18 @@ public class AdminController {
 		DAO dao = new DAO();
 		String id = request.getParameter("oid");
 		ArrayList<OrderLine> listO = new ArrayList<>();
+		Order order = new Order();
+
 		try {
 			int oid = Integer.parseInt(id);		
+			order = dao.getOrderByOid(oid, 0);
 			listO = dao.getAllOrderLineByOid(oid);		
 			System.out.println(listO);
 		} catch (Exception e) {
 			
 		}
+		System.out.println(order);
+		model.addAttribute("order", order);
 		model.addAttribute("listO", listO);
 		return "/admin/OrderDetailPending";
 	}
@@ -197,13 +202,16 @@ public class AdminController {
 		DAO dao = new DAO();
 		String id = request.getParameter("oid");
 		ArrayList<OrderLine> listO = new ArrayList<>();
+		Order order = new Order();
 		try {
 			int oid = Integer.parseInt(id);		
 			listO = dao.getAllOrderLineByOid(oid);		
-			
+			order = dao.getOrderByOid(oid, 0);
+			System.out.println(listO);
 		} catch (Exception e) {
 			
 		}
+		model.addAttribute("order", order);
 		model.addAttribute("listO", listO);
 		return "/admin/OrderedDetail";
 	}

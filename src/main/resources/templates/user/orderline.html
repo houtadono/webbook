@@ -42,6 +42,10 @@
 		}
 
 		table tbody tr th {}
+
+		label {
+			width: 150px;
+		}
 	</style>
 </head>
 
@@ -56,10 +60,14 @@
 				<div class="row row-header">
 					<!-- LOGO -->
 					<div class="col-md-3">
-						<div style="display: flex;" class="header-logo">
+						<!-- <div style="display: flex;" class="header-logo">
 							<h1 style="margin-top: 10px;color: white;">Sách </h1>
 							<img style="height: 40px;margin-top: 10px;margin-left: 15px;" src="uploads/book1.png">
-						</div>
+						</div> -->
+						<a th:href="@{/home}" style="display: flex;" class="header-logo">
+							<h1 style="margin-top: 10px;color: white;">Sách </h1>
+							<img style="height: 40px;margin-top: 10px;margin-left: 15px;" src="uploads/book1.png">
+						</a>
 					</div>
 					<!-- /LOGO -->
 
@@ -145,9 +153,9 @@
 									<li>
 										<a href="#" style="font-size: 15px;color: white;"><i class="fa fa-user-o"
 												style="margin-right: 4px;font-size: 16px;color: wheat;"></i>[[${session.account.username}]]</a>
-										<ul class="out-in" style="width: 100px">
-											<li><a th:href="@{/mypage}" style="font-size: 11px">Đơn hàng</a></li>
-											<li><a th:href="@{/logout}" style="font-size: 11px">Đăng xuất</a></li>
+										<ul class="out-in" style="padding:0; box-shadow: 0px 0px 0px 2px #E4E7ED;">  
+											<li style="height: auto; padding: 0;"><a class="btn btn-info" th:href="@{/mypage}" style="font-size: 14px; width: 100%;border-radius: 0;">Đơn hàng</a></li>
+											<li style="height: auto; padding: 0;"><a class="btn btn-danger" th:href="@{/logout}" style="font-size: 14px; width: 100%;border-radius: 0;">Đơn hàng</a></li>
 										</ul>
 									</li>
 								</ul>
@@ -168,10 +176,32 @@
 	<!-- /HEADER -->
 	<div class="container">
 		<div class="row" style="display: flex; justify-content: space-between; align-items: center;">
-			<a class="btn btn-primary" th:href="@{/prePage?currentPage=orderline}" style="margin-right: auto;">Trở về</a>
+			<a class="btn btn-primary" th:href="@{/mypage}" style="margin-right: auto;">Trở về</a>
 			<h3 style="margin: 0; text-align: center; flex-grow: 1;">Chi tiết đơn hàng</h3>
 		</div>
+		<div style="display: flex; justify-content: space-evenly;">
+			<div>
+				<label for="name">Họ và tên:</label>
+				<input type="text" id="name" name="name" th:value="${order.name}" readonly> <br>
 
+				<label for="phone">Số điện thoại:</label>
+				<input type="text" id="phone" name="phone" th:value="${order.phone}" readonly> <br>
+
+				<label for="address">Địa chỉ:</label>
+				<input type="text" id="address" name="address" th:value="${order.address}" readonly> <br>
+			</div>
+			<div>
+				<label for="day">Ngày đặt:</label>
+				<input type="text" id="day" name="day" th:value="${order.day}" readonly> <br>
+
+				<label for="quantity">Số lượng sản phẩm :</label>
+				<input type="text" id="quantity" name="quantity" th:value="${order.quantity}" readonly> <br>
+
+				<label for="money">Tổng giá trị đơn:</label>
+				<input type="text" id="money" name="money"
+					th:value=" ${#numbers.formatDecimal(order.totalMoney, 0, 'COMMA', 0, 'POINT')+' đ' }" readonly> <br>
+			</div>
+		</div>
 		<table class="table table-bordered table-hover" style="width: 100%">
 			<thead class="table-dark">
 				<tr style=" background-color: orange">
@@ -183,16 +213,16 @@
 					<th>Số Lượng</th>
 					<th>Thành Tiền</th>
 					<th>Trạng Thái</th>
-					<th style="width: 170px" th:if="${check==0}">Hủy Đặt</th>
+					<th style="width: 170px" th:if="${check==0 && listO.size > 1}">Hủy Đặt</th>
 				</tr>
 			</thead>
 
 			<tbody>
 				<tr th:each="o:${listO}" style="text-align: center">
-					<td><a th:href="@{'/detail?id='+${o.bid}}"><img style="width: 110px;height: 80px;margin-left: 7px"
+					<td th:onclick="'window.location.href=\'/detail?id=' + ${o.bid} + '\''"><a th:href="@{'/detail?id='+${o.bid}}"><img style="width: 110px;height: 80px;margin-left: 7px"
 								th:src="@{'/uploads/'+${o.image}}" /></a></td>
 					<td>
-						<div style="margin-top: 30px">[[${o.title}]]</div>
+						<div style="margin-top: 30px;cursor: pointer;"th:onclick="'window.location.href=\'/detail?id=' + ${o.bid} + '\''" >[[${o.title}]]</div>
 					</td>
 					<td>
 						<div style="margin-top: 30px">[[${o.author}]]</div>
@@ -201,13 +231,15 @@
 						<div style="margin-top: 30px">[[${o.category}]]</div>
 					</td>
 					<td>
-						<div style="margin-top: 30px">[[${o.price}]]</div>
+						<p style="margin-top: 30px"
+							th:text=" ${#numbers.formatDecimal(o.price, 0, 'COMMA', 0, 'POINT')+' đ' }"></p>
 					</td>
 					<td>
 						<div style="margin-top: 30px">[[${o.quantity}]]</div>
 					</td>
 					<td>
-						<div style="margin-top: 30px">[[${o.totalMoney}]]đ</div>
+						<p style="margin-top: 30px"
+							th:text=" ${#numbers.formatDecimal(o.totalMoney, 0, 'COMMA', 0, 'POINT')+' đ' }"></p>
 					</td>
 					<td th:if="${check==0}">
 						<div style="margin-top: 30px">Đang chờ duyệt</div>
@@ -215,18 +247,37 @@
 					<td th:if="${check==1}">
 						<div style="margin-top: 30px">Đã duyệt</div>
 					</td>
-					<td th:if="${check==0}">
+					<td th:if="${check==-1}">
+						<div style="margin-top: 30px">Đã hủy đặt</div>
+					</td>
+					<td th:if="${check==0 && listO.size > 1}">
 						<div style="margin-top: 20px"><a
 								th:href="@{'/deleteOrderLine?oid=' + ${o.oid}} + '&bid=' + ${o.bid} + '&quantity=' + ${o.quantity}"
 								onclick=" return confirm('Bạn có chắc chắn muốn hủy?')"
 								style="margin-left: 10px;color: white;font-weight: bold" class="btn btn-danger"><i
-									class="fa fa-minus-circle" style="color: blue;margin-right: 4px"></i>Hủy</a>
+									class="fa fa-minus-circle" style="color: blue;margin-right: 4px"></i>Hủy đặt sản phẩm</a>
 						</div>
 					</td>
 				</tr>
 			</tbody>
-
 		</table>
+		<div class="row" style="display: flex; justify-content: end; align-items: center;">
+			<div style="margin-top: 5px"  th:if="${check==0}"><a th:href="@{'/delete/Order?oid=' + ${order.id}}"
+				onclick=" return confirm('Bạn có chắc chắn muốn hủy?')"
+				style="margin-left: 10px;color: white;font-weight: bold" class="btn btn-danger"><i
+					class="fa fa-minus-circle" style="color: blue;margin-right: 10px"></i>Hủy đơn hàng</a></div>
+
+			<div style="display: flex;margin-top: 5px;margin-left: 8px" th:if="${check==-1}"><a
+				th:href="@{'/restoreOrder?oid=' + ${order.id}}"
+				onclick=" return confirm('Bạn có muốn thêm vào giỏ?')" class="btn btn-success"
+				style="color: white;font-weight: bold"><i class="fa fa-history"
+					style="color: blue;margin: 0 4px"></i>Đặt lại</a></div>
+			<div style="display: flex;margin-top: 5px" th:if="${check==-1}"><a
+					th:href="@{'/deleteOrderDelete?oid=' + ${order.id}}"
+					onclick=" return confirm('Bạn có chắc chắn muốn đơn hàng xóa?')"
+					style="margin-left: 10px;color: white;font-weight: bold" class="btn btn-danger"><i
+						class="fa fa-minus-circle" style="color: blue;margin-right: 10px"></i>Xóa đơn hàng</a></div>
+		</div>
 	</div>
 
 
